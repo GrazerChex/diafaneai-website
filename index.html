@@ -1,0 +1,868 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>DiafaneAI Website</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<meta name="description" content="DiafaneAI is an audit trail for AI use in GMP documentation. It records what AI contributed and shows who made each decision.">
+<style>
+/* Lato is served from this website (no Google Fonts). SIL Open Font License, see assets/fonts/OFL.txt */
+@font-face { font-family: "Lato"; font-style: normal; font-weight: 300; font-display: swap; src: url("assets/fonts/lato-latin-300-normal.woff2") format("woff2"); }
+@font-face { font-family: "Lato"; font-style: normal; font-weight: 400; font-display: swap; src: url("assets/fonts/lato-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Lato"; font-style: italic; font-weight: 400; font-display: swap; src: url("assets/fonts/lato-latin-400-italic.woff2") format("woff2"); }
+@font-face { font-family: "Lato"; font-style: normal; font-weight: 700; font-display: swap; src: url("assets/fonts/lato-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Lato"; font-style: normal; font-weight: 900; font-display: swap; src: url("assets/fonts/lato-latin-900-normal.woff2") format("woff2"); }
+
+/* Layout: airy, white, light-weight oversized headlines with a gradient second line.
+   Content sits in large soft panels. The gradient runs human-blue -> together-teal -> AI-orange,
+   colours taken from the logo: violet, blue, teal, green. Dark mode is the default. */
+:root {
+  color-scheme: light;
+  --bg: #ffffff;
+  --panel: #f6f6fc;
+  --ink: #141414;
+  --ink-2: #4c4b5a;
+  --ink-3: #75748a;
+  --line: #e4e3ee;
+  --blue: #0784c9;
+  --violet: #6a4fe8; --sky: #0784c9; --teal: #0e9f75; --leaf: #5c9d13;
+  --human: #0a74b8; --human-bg: #e3f1fa;
+  --joint: #0b8461; --joint-bg: #e0f3ec;
+  --ai: #6a4fe8;   --ai-bg: #eeeafd;
+  --flag: #c4321f;
+  --grad: linear-gradient(92deg, #6a4fe8 0%, #0784c9 36%, #0e9f75 68%, #5c9d13 100%);
+  --soft: linear-gradient(115deg, rgba(106,79,232,.10) 0%, rgba(7,132,201,.06) 45%, rgba(255,255,255,0) 100%);
+  --f: "Lato", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --maxw: 1160px;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: var(--maxw); margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { margin: 0; font-weight: 400; text-wrap: balance; }
+h1 { font-size: clamp(2.6rem, 7vw, 5.4rem); line-height: 1.02; letter-spacing: -0.035em; font-weight: 300; }
+h2 { font-size: clamp(2rem, 4.6vw, 3.4rem); line-height: 1.06; letter-spacing: -0.03em; font-weight: 300; }
+h3 { font-size: 1.25rem; line-height: 1.3; font-weight: 700; letter-spacing: -0.005em; }
+.g { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; display: inline-block; padding-bottom: .06em; }
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 6px; }
+.lead { font-size: 1.15rem; color: var(--ink-2); max-width: 58ch; }
+.lead b { color: var(--ink); font-weight: 700; }
+
+/* Pills */
+.pill { display: inline-flex; align-items: center; gap: 10px; border-radius: 100px; padding: 11px 14px 11px 20px; font-size: .95rem; font-weight: 700; text-decoration: none; border: 1px solid transparent; white-space: nowrap; }
+.pill .dot { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: rgba(127,127,127,.22); }
+.pill.dark { background: var(--ink); color: #fff; }
+.pill.blue { background: var(--blue); color: #fff; }
+.pill.light { background: #fff; color: var(--ink); border-color: var(--line); padding: 11px 20px; }
+.pill:hover { filter: brightness(1.12); }
+
+/* Header */
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: rgba(255,255,255,.88); backdrop-filter: blur(10px); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: #fff; }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 14px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 700; font-size: 1.1rem; letter-spacing: -0.01em; }
+.brand svg { flex: none; }
+.logo-img { display: block; width: auto; }
+.brand { gap: 10px; }
+.logo-mark { height: 36px; } .logo-text { height: 22px; }
+@media (max-width: 640px) { .logo-mark { height: 31px; } }
+.logo-img.on-dark { display: none; }
+html.is-dark .logo-img.on-dark { display: block; }
+html.is-dark .logo-img.on-light { display: none; }
+footer .foot-brand { gap: 7px; } footer .logo-mark { height: 25px; } footer .logo-text { height: 16px; }
+
+nav.links { display: flex; align-items: center; gap: 28px; font-size: .95rem; }
+nav.links a:not(.pill) { text-decoration: none; color: var(--ink-2); }
+nav.links a:not(.pill):hover { color: var(--ink); }
+
+
+/* Hero */
+.hero { padding-block: 0 48px; text-align: center; }
+.hero .copy { display: grid; justify-items: center; align-content: center; gap: 34px; min-height: calc(100vh - 80px); min-height: calc(100svh - 80px); padding-block: 48px 72px; position: relative; }
+.scroll-cue { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; color: var(--ink-3); text-decoration: none; }
+.scroll-cue:hover { color: var(--ink); }
+@media (prefers-reduced-motion: no-preference) { .scroll-cue svg { animation: cue 2.4s ease-in-out infinite; } @keyframes cue { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(3px); } } }
+.hero .copy h1 { margin-bottom: 6px; }
+.hero .ctas { margin-top: 8px; }
+.hero .lead { margin: 0 auto; }
+.hero .ctas { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.hero .stage { font-size: .9rem; color: var(--ink-3); }
+.stage-panel { margin-top: 0; background: var(--soft), var(--panel); border-radius: 28px; padding: clamp(20px, 5vw, 56px); display: grid; place-items: center; text-align: left; }
+@media (max-width: 900px) { .hero .copy { min-height: calc(100vh - 112px); min-height: calc(100svh - 112px); } }
+@media (max-width: 640px) { .hero { padding-block: 0 24px; } .hero .copy { gap: 26px; padding-block: 32px 72px; } .stage-panel { border-radius: 20px; } }
+
+/* Section scaffolding */
+section.s { padding-block: 104px 0; }
+.s-head { display: grid; gap: 20px; margin-bottom: 48px; max-width: 860px; }
+@media (max-width: 640px) { section.s { padding-block: 72px 0; } .s-head { margin-bottom: 32px; } }
+.panel { background: var(--soft), var(--panel); border-radius: 28px; padding: clamp(20px, 4.5vw, 52px); }
+@media (max-width: 640px) { .panel { border-radius: 20px; } }
+
+/* Labels used in the examples */
+.lbl { display: inline-flex; align-items: center; gap: 6px; font-size: .74rem; font-weight: 700; padding: 3px 10px; border-radius: 100px; white-space: nowrap; }
+.lbl::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.lbl.human { color: var(--human); background: var(--human-bg); }
+.lbl.ai { color: var(--ai); background: var(--ai-bg); }
+.lbl.joint { color: var(--joint); background: var(--joint-bg); }
+figure { margin: 0; min-width: 0; }
+figcaption { font-size: .8rem; color: var(--ink-3); margin-top: 12px; }
+
+/* Card used for example documents */
+.card { background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 1px 2px rgba(12,15,18,.04), 0 12px 32px rgba(60,40,140,.08); min-width: 0; overflow: hidden; }
+
+/* Hero document */
+.doc { width: 100%; max-width: 680px; }
+.doc-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 14px 22px; border-bottom: 1px solid var(--line); font-size: .8rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.doc-head b { color: var(--ink); }
+.sec { display: grid; grid-template-columns: 3px 1fr; gap: 16px; padding: 16px 22px; border-bottom: 1px solid var(--line); }
+.sec .bar { border-radius: 2px; }
+.sec.human .bar { background: var(--human); } .sec.joint .bar { background: var(--joint); } .sec.ai .bar { background: var(--ai); }
+.sec-top { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 4px; }
+.sec-title { font-weight: 700; font-size: .95rem; }
+.sec p { font-size: .92rem; color: var(--ink-2); }
+.decision { padding: 16px 22px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; background: var(--human-bg); }
+.decision b { display: block; font-size: .95rem; }
+.decision span.m { font-size: .82rem; color: var(--ink-2); }
+
+/* Problem */
+.icons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-bottom: 56px; }
+.icon-item { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.ic { position: relative; width: 52px; height: 52px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; color: var(--ink); background: #fff; }
+.ic::after { content: ""; position: absolute; top: -1px; right: -1px; width: 12px; height: 12px; border-radius: 50%; background: var(--ai); border: 2px solid #fff; }
+.icon-item p { color: var(--ink-2); font-size: .98rem; }
+@media (max-width: 820px) { .icons { grid-template-columns: 1fr; gap: 28px; } }
+
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.compare .card { padding: 24px; display: grid; gap: 14px; align-content: start; }
+.compare .k { font-size: .8rem; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: .06em; }
+.compare .text { font-size: 1.02rem; line-height: 1.75; }
+.compare .qs { display: grid; gap: 6px; font-size: .85rem; color: var(--flag); }
+.compare .sign { font-size: .85rem; color: var(--ink-2); border-top: 1px solid var(--line); padding-top: 12px; }
+mark { color: inherit; padding: 1px 3px; border-radius: 4px; }
+mark.h { background: var(--human-bg); box-shadow: inset 0 -2px 0 var(--human); }
+mark.a { background: var(--ai-bg); box-shadow: inset 0 -2px 0 var(--ai); }
+mark.j { background: var(--joint-bg); box-shadow: inset 0 -2px 0 var(--joint); }
+.legend { display: flex; gap: 8px; flex-wrap: wrap; }
+@media (max-width: 760px) { .compare { grid-template-columns: 1fr; } }
+.after { margin-top: 40px; font-size: 1.5rem; font-weight: 300; letter-spacing: -0.015em; line-height: 1.35; max-width: 34ch; }
+
+/* Why now table */
+.tbl { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .98rem; }
+th, td { text-align: left; vertical-align: top; padding: 20px 24px; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: 0; }
+th { font-size: .78rem; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: .06em; padding-block: 16px; }
+td:first-child { font-weight: 700; width: 34%; }
+td:last-child { color: var(--ink-2); }
+@media (max-width: 600px) { th, td { padding: 14px 16px; } td:first-child { width: auto; } }
+
+/* How it works */
+.how { display: grid; gap: 24px; }
+.how .panel { display: grid; grid-template-columns: 1fr 1.1fr; gap: 48px; align-items: center; }
+.how .panel.rev { grid-template-columns: 1.1fr 1fr; }
+.how .panel.rev .txt { order: 2; }
+.how .txt { display: grid; gap: 16px; min-width: 0; }
+.how .step-no { font-size: .8rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.how .txt p { color: var(--ink-2); }
+.how h3 { font-size: clamp(1.5rem, 2.6vw, 2rem); font-weight: 300; letter-spacing: -0.02em; line-height: 1.15; }
+@media (max-width: 900px) { .how .panel, .how .panel.rev { grid-template-columns: 1fr; gap: 28px; } .how .panel.rev .txt { order: 0; } }
+
+.flow { padding: 22px; display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: center; }
+.flow .src { display: grid; gap: 8px; font-size: .88rem; min-width: 0; }
+.flow .src div { border: 1px solid var(--line); border-radius: 12px; padding: 9px 12px; }
+.flow .arr { color: var(--ink-3); }
+.flow .log { background: var(--ink); color: #fff; border-radius: 14px; padding: 14px 16px; font-size: .8rem; display: grid; gap: 8px; min-width: 0; font-variant-numeric: tabular-nums; }
+.flow .log b { font-size: .92rem; }
+.flow .log span { color: rgba(255,255,255,.75); border-top: 1px solid rgba(255,255,255,.14); padding-top: 8px; }
+@media (max-width: 520px) { .flow { grid-template-columns: 1fr; } .flow .arr { transform: rotate(90deg); justify-self: center; } }
+
+.record { font-size: .9rem; }
+.record .rh { padding: 14px 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.record .rh span { color: var(--ink-3); font-size: .8rem; }
+.record .prompt { padding: 14px 20px; border-bottom: 1px solid var(--line); display: grid; gap: 6px; background: var(--ai-bg); }
+.record .prompt p { font-size: .86rem; color: var(--ink); font-style: italic; }
+.record .pl { font-size: .72rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); }
+.record .opts { padding: 14px 20px; display: grid; gap: 8px; border-bottom: 1px solid var(--line); }
+.opt { display: grid; grid-template-columns: 1.4rem 1fr auto; gap: 10px; align-items: center; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line); }
+.opt .k { color: var(--ink-3); font-weight: 700; }
+.opt .st { font-size: .74rem; font-weight: 700; color: var(--ink-3); }
+.opt.no span:nth-child(2) { color: var(--ink-3); text-decoration: line-through; }
+.opt.yes { border-color: var(--human); background: var(--human-bg); }
+.opt.yes .st { color: var(--human); }
+.record ol { list-style: none; margin: 0; padding: 14px 20px; display: grid; gap: 10px; border-bottom: 1px solid var(--line); }
+.record ol li { display: grid; grid-template-columns: 3.2rem 1fr; gap: 10px; font-size: .86rem; }
+.record ol .t { color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.record ol li.flag span:last-child { color: var(--flag); font-weight: 700; }
+.record .sg { padding: 14px 20px; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; }
+.record .sg i { font-size: 1.1rem; }
+.record .sg span { font-size: .8rem; color: var(--ink-3); }
+
+.later { display: grid; grid-template-columns: 1fr; gap: 24px; margin-top: 24px; }
+.later .card p { max-width: 72ch; }
+.later .card { padding: 28px; display: grid; gap: 10px; align-content: start; box-shadow: none; }
+.later .card p { color: var(--ink-2); }
+.later .tag { font-size: .74rem; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: .06em; }
+@media (max-width: 760px) { .later { grid-template-columns: 1fr; } }
+
+/* Audience */
+/* Team */
+.team { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.team .panel { display: grid; grid-template-columns: 132px 1fr; gap: 24px; align-items: start; }
+.team .photo { width: 132px; aspect-ratio: 1; border-radius: 22px; border: 1.5px dashed color-mix(in srgb, var(--acc) 55%, transparent); background: color-mix(in srgb, var(--tint) 60%, transparent); display: grid; place-items: center; align-content: center; gap: 6px; color: var(--acc); font-size: .78rem; }
+.team .photo.has-img { border: 0; background: none; }
+.team .photo img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+.team h3 { font-size: 1.5rem; font-weight: 300; letter-spacing: -0.02em; }
+.team .role { font-size: .9rem; color: var(--ink-3); display: block; margin: 4px 0 12px; }
+.team p { color: var(--ink-2); }
+.ph-t { background: color-mix(in srgb, var(--acc) 16%, transparent); border-radius: 6px; padding: 0 4px; }
+@media (max-width: 900px) { .team { grid-template-columns: 1fr; } }
+@media (max-width: 480px) { .team .panel { grid-template-columns: 1fr; } }
+.aud { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.aud .panel { display: grid; gap: 12px; align-content: start; }
+.aud .role { font-size: .9rem; color: var(--ink-3); }
+.aud p { color: var(--ink-2); }
+.aud h3 { font-size: 1.6rem; font-weight: 300; letter-spacing: -0.02em; }
+.users { margin-top: 28px; color: var(--ink-2); max-width: 64ch; }
+@media (max-width: 760px) { .aud { grid-template-columns: 1fr; } }
+
+/* Closing */
+.closing { padding-block: 120px 96px; text-align: center; }
+.closing .copy { display: grid; justify-items: center; gap: 24px; }
+.closing .lead { margin: 0 auto; }
+@media (max-width: 640px) { .closing { padding-block: 80px 64px; } }
+
+footer { border-top: 1px solid var(--line); padding-block: 32px; font-size: .88rem; color: var(--ink-3); }
+footer .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+footer .foot-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); font-weight: 700; }
+footer nav { display: flex; gap: 22px; }
+footer a { text-decoration: none; }
+footer a:hover { color: var(--ink); }
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+/* Section bands and orientation */
+section[id] { scroll-margin-top: 76px; }
+section.s.band { background: var(--band); padding-block: 96px; }
+@media (max-width: 640px) { section.s.band { padding-block: 64px; } section[id] { scroll-margin-top: 112px; } }
+.band .panel { background: rgba(255,255,255,.62); border: 1px solid rgba(255,255,255,.95); }
+.band .card { border-color: color-mix(in srgb, var(--acc) 14%, var(--line)); }
+.sec-label { display: inline-flex; align-items: center; gap: 8px; justify-self: start; font-size: .8rem; font-weight: 700; letter-spacing: .04em; color: var(--acc); background: var(--tint); padding: 5px 12px; border-radius: 100px; }
+.sec-label::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--acc); }
+.band .g { background: var(--grad); -webkit-background-clip: text; background-clip: text; }
+.band .ic { border-color: color-mix(in srgb, var(--acc) 25%, var(--line)); }
+.closing.dark { background: #0c0f12; color: #fff; }
+.closing.dark .lead { color: rgba(255,255,255,.72); }
+.closing.dark .pill.dark, html.is-dark .closing.dark .pill.dark { background: #fff; color: #141414; }
+
+/* Header navigation with current section */
+header.top { border-bottom: 1px solid var(--line); }
+nav.links { gap: 4px; }
+nav.links a[data-sec]:not(.pill) { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 100px; white-space: nowrap; transition: background-color .2s, color .2s; }
+nav.links a[data-sec]:not(.pill)::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--acc); opacity: .35; transition: opacity .2s; }
+nav.links a[data-sec]:not(.pill):hover { background: color-mix(in srgb, var(--tint) 55%, transparent); }
+nav.links a.active:not(.pill) { background: var(--tint); color: var(--ink); font-weight: 700; }
+nav.links a.active:not(.pill)::before { opacity: 1; }
+nav.links .pill { margin-left: 12px; padding: 0 20px; height: 46px; line-height: 1; justify-content: center; align-items: center; }
+nav.links .pill.active { box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--ink); }
+.progress { position: absolute; left: 0; bottom: -1px; height: 2px; width: 0; background: var(--grad); }
+@media (max-width: 900px) {
+  .top .wrap { flex-wrap: wrap; row-gap: 8px; padding-block: 10px; }
+  nav.links { order: 3; width: 100%; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; margin-inline: -4px; }
+  nav.links::-webkit-scrollbar { display: none; }
+  nav.links .pill { margin-left: 4px; padding: 7px 14px; }
+}
+@media (prefers-reduced-motion: reduce) { nav.links a { transition: none !important; } }
+
+html { scroll-padding-top: 66px; }
+@media (max-width: 900px) { html { scroll-padding-top: 108px; } }
+
+
+.mode-toggle { flex: none; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: transparent; color: var(--ink); display: grid; place-items: center; cursor: pointer; }
+.mode-toggle:hover { background: var(--panel); }
+.mode-toggle .sun { display: none; } .mode-toggle .moon { display: block; }
+html.is-dark .mode-toggle .sun { display: block; } html.is-dark .mode-toggle .moon { display: none; }
+
+
+.tm-note { display: block !important; margin-top: 14px; font-size: .78rem; color: var(--ink-3); }
+/* Source numbers and list */
+sup.ref { font-size: .62em; line-height: 0; margin-left: 1px; vertical-align: super; }
+sup.ref a { line-height: 1.5; vertical-align: baseline; }
+sup.ref a { display: inline-block; min-width: 1.5em; padding: 0 .3em; margin-left: 2px; border-radius: 100px; background: color-mix(in srgb, var(--blue) 14%, transparent); color: var(--blue); text-decoration: none; font-weight: 700; text-align: center; }
+sup.ref a:hover { background: var(--blue); color: var(--bg); }
+.sources { padding-block: 72px; border-top: 1px solid var(--line); scroll-margin-top: 80px; }
+.sources h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
+.sources .muted-note { color: var(--ink-3); font-size: .9rem; margin: 10px 0 28px; }
+.src-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px 40px; }
+.src-list li { display: grid; grid-template-columns: 30px 1fr; gap: 12px; font-size: .92rem; color: var(--ink-2); scroll-margin-top: 90px; padding: 10px; margin: -10px; border-radius: 12px; min-width: 0; }
+.src-list li:target { background: var(--panel); outline: 1px solid var(--line); }
+.src-list .n { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: .8rem; color: var(--blue); border: 1px solid var(--line); }
+.src-list b { color: var(--ink); }
+.src-list .d { color: var(--ink-3); }
+.src-list a { color: var(--blue); word-break: break-word; }
+@media (max-width: 760px) { .src-list { grid-template-columns: 1fr; } }
+
+/* Company interest form */
+.shape-grid { display: grid; grid-template-columns: 1fr 1.05fr; gap: 56px; align-items: start; }
+.shape-copy { display: grid; gap: 20px; min-width: 0; }
+.perks { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 14px; }
+.perks li { padding-left: 20px; position: relative; color: var(--ink-2); }
+.perks li::before { content: ""; position: absolute; left: 0; top: .6em; width: 8px; height: 8px; border-radius: 50%; background: var(--grad); }
+.perks b { color: var(--ink); }
+.shape-form { padding: clamp(20px, 3.5vw, 32px); display: grid; gap: 16px; min-width: 0; }
+.shape-form h3 { font-size: 1.25rem; }
+.f-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.f { display: grid; gap: 6px; min-width: 0; border: 0; padding: 0; margin: 0; }
+.f label, .f legend { font-size: .85rem; font-weight: 700; color: var(--ink-2); padding: 0; }
+.f legend { margin-bottom: 6px; }
+.opt-l { font-weight: 400; color: var(--ink-3); }
+.f input, .f select, .f textarea { font: inherit; font-size: .95rem; width: 100%; min-height: 44px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.f textarea { resize: vertical; min-height: 84px; }
+.f input:focus, .f select:focus, .f textarea:focus { outline: 2px solid var(--blue); outline-offset: 1px; border-color: transparent; }
+.f input[aria-invalid="true"] { border-color: var(--flag); }
+.chk { display: flex !important; align-items: center; gap: 10px; font-weight: 400 !important; color: var(--ink) !important; font-size: .95rem !important; min-height: 32px; }
+.chk input { width: 18px; height: 18px; min-height: 0; accent-color: var(--ai); }
+.f-submit { justify-self: start; border: 0; cursor: pointer; font: inherit; font-weight: 700; }
+.f-note, .f-done { font-size: .84rem; color: var(--ink-3); }
+.f-done { color: var(--joint); font-weight: 700; }
+.f-error { font-size: .88rem; color: var(--flag); font-weight: 700; }
+.inline-link { color: var(--acc); font-weight: 700; text-decoration: none; }
+.inline-link:hover { text-decoration: underline; }
+@media (max-width: 900px) { .shape-grid { grid-template-columns: 1fr; gap: 32px; } }
+@media (max-width: 560px) { .f-row { grid-template-columns: 1fr; } }
+/* Conversation topics */
+.topics { list-style: none; margin: 8px 0 4px; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: left; max-width: 980px; width: 100%; }
+.topics li { display: grid; gap: 6px; align-content: start; padding: 20px; border-radius: 18px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.10); }
+.topics li::before { content: ""; width: 28px; height: 3px; border-radius: 2px; background: var(--grad); }
+.topics b { color: #fff; }
+.topics span { color: rgba(255,255,255,.72); font-size: .95rem; }
+.mail-line { color: rgba(255,255,255,.6); font-size: .9rem; }
+.mail-line .sel { color: #fff; user-select: all; }
+@media (max-width: 820px) { .topics { grid-template-columns: 1fr; } }
+.confid { max-width: 640px; width: 100%; display: grid; gap: 6px; text-align: left; padding: 18px 22px; border-radius: 18px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); position: relative; overflow: hidden; }
+.confid b { color: #fff; }
+.confid span { color: rgba(255,255,255,.75); font-size: .95rem; }
+.cx-conf { font-size: .9rem; }
+.cx-conf b { color: var(--ink); }
+.sel-wrap { position: relative; }
+.sel-wrap select { -webkit-appearance: none; -moz-appearance: none; appearance: none; padding-right: 44px; cursor: pointer; }
+.sel-wrap::after { content: ""; position: absolute; right: 18px; top: 50%; width: 7px; height: 7px; border-right: 2px solid var(--ink-2); border-bottom: 2px solid var(--ink-2); transform: translateY(-70%) rotate(45deg); pointer-events: none; }
+/* Contact window */
+[hidden] { display: none !important; }
+.cx[hidden] { display: none; }
+.cx { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 20px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); background: rgba(3,5,8,.66); backdrop-filter: blur(6px); }
+.cx-box { position: relative; width: min(520px, 100%); background: var(--surface, #fff); border: 1px solid var(--line); border-radius: 24px; padding: 32px; display: grid; gap: 16px; box-shadow: 0 30px 80px rgba(0,0,0,.5); overflow: hidden; }
+.cx-box::before { content: ""; position: absolute; inset: 0 0 auto; height: 3px; background: var(--grad); }
+.cx-box h2 { font-size: clamp(1.8rem, 4vw, 2.4rem); }
+.cx-box p { color: var(--ink-2); }
+.cx-mail { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 14px 16px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); }
+.cx-mail span { flex: 1 1 200px; font-weight: 700; font-size: 1.1rem; user-select: all; word-break: break-all; }
+.cx-mail button, .cx-close { font: inherit; cursor: pointer; border-radius: 100px; }
+.cx-mail button { border: 0; background: var(--ink); color: var(--bg); font-weight: 700; padding: 8px 16px; }
+.cx-close { position: absolute; top: 14px; right: 14px; width: 40px; height: 40px; border: 1px solid var(--line); background: transparent; color: var(--ink-2); display: grid; place-items: center; }
+.cx-close:hover { color: var(--ink); }
+.cx-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.cx-box .pill.dark { justify-self: start; }
+@media (prefers-reduced-motion: no-preference) { .cx-box { animation: cxin .22s ease both; } @keyframes cxin { from { transform: translateY(10px); opacity: .001; } to { transform: none; opacity: 1; } } }
+</style>
+<style id="dark-css">
+/* ===== Dark edition ===== */
+:root {
+  color-scheme: dark;
+  --bg: #0c0c14; --panel: #12121d; --surface: #171724; --surface-2: #1e1e2e;
+  --ink: #f1f0f7; --ink-2: #b5b3c7; --ink-3: #8e8ca3; --line: #2a2a3e;
+  --blue: #4fb2f0;
+  --human: #5cb6f2; --human-bg: #0e2a40;
+  --joint: #3fd1a2; --joint-bg: #0d3529;
+  --ai: #a28fff; --ai-bg: #251d4d;
+  --flag: #ff7d6e;
+  --grad: linear-gradient(92deg, #9d88ff 0%, #4fb2f0 36%, #3fd1a2 68%, #a3d45a 100%);
+  --soft: radial-gradient(120% 140% at 0% 0%, rgba(106,79,232,.24) 0%, rgba(7,132,201,.08) 40%, rgba(12,12,20,0) 75%);
+}
+body { background: var(--bg); color: var(--ink); }
+body::before { background: var(--bg); }
+header.top { background: rgba(12,12,20,.82); border-bottom-color: var(--line); }
+.pill.dark { background: #fff; color: #0c0c14; }
+.pill.light { background: transparent; color: var(--ink); border-color: #3a3a52; }
+.pill.light:hover { background: var(--surface); filter: none; }
+nav.links .pill.active { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px #fff; }
+.card { background: var(--surface); border-color: var(--line); box-shadow: 0 1px 0 rgba(255,255,255,.03) inset, 0 18px 40px rgba(0,0,0,.35); }
+.band .card { border-color: color-mix(in srgb, var(--acc) 22%, var(--line)); }
+.ic { background: var(--surface); }
+.ic::after { border-color: var(--bg); }
+.flow .log { background: #07070d; border: 1px solid var(--line); }
+.decision { background: var(--human-bg); }
+.opt.yes { background: var(--human-bg); }
+.stage-panel { background: var(--soft), var(--panel); box-shadow: 0 0 0 1px var(--line) inset; }
+.band .panel { background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.07); }
+.hero h1 { text-shadow: none; }
+.closing.dark { background: radial-gradient(90% 120% at 50% 110%, rgba(106,79,232,.30) 0%, rgba(7,132,201,.12) 35%, rgba(7,7,13,0) 70%), #07070d; }
+
+/* Section colours, dark */
+#problem { --band: #120f24 !important; --tint: #251d4d !important; --acc: #a28fff !important; }
+#why-now { --band: #0a1622 !important; --tint: #0e2a40 !important; --acc: #5cb6f2 !important; }
+#how { --band: #081a14 !important; --tint: #0d3529 !important; --acc: #3fd1a2 !important; }
+#who { --band: #10170a !important; --tint: #22330f !important; --acc: #a3d45a !important; }
+#team { --band: #0a1622 !important; --tint: #0e2a40 !important; --acc: #5cb6f2 !important; }
+#shape { --band: #120f24 !important; --tint: #251d4d !important; --acc: #a28fff !important; }
+nav.links a[data-sec="problem"] { --tint: #251d4d !important; --acc: #a28fff !important; }
+nav.links a[data-sec="why-now"] { --tint: #0e2a40 !important; --acc: #5cb6f2 !important; }
+nav.links a[data-sec="how"] { --tint: #0d3529 !important; --acc: #3fd1a2 !important; }
+nav.links a[data-sec="who"] { --tint: #22330f !important; --acc: #a3d45a !important; }
+nav.links a[data-sec="team"] { --tint: #0e2a40 !important; --acc: #5cb6f2 !important; }
+section.s.band { background: radial-gradient(70% 90% at 100% 10%, color-mix(in srgb, var(--acc) 14%, transparent) 0%, transparent 70%), var(--band); }
+
+</style>
+<script>
+(function () {
+  var mode = 'dark';
+  try { mode = localStorage.getItem('diafane-mode') || 'dark'; } catch (e) {}
+  var css = document.getElementById('dark-css');
+  if (css) css.disabled = mode === 'light';
+  document.documentElement.classList.toggle('is-dark', mode !== 'light');
+})();
+</script>
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta property="og:title" content="DiafaneAI">
+<meta property="og:description" content="An audit trail for AI in GMP documentation.">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="DiafaneAI home"><img class="logo-img logo-mark on-light" src="assets/mark-light.png" alt="" width="38" height="36"><img class="logo-img logo-mark on-dark" src="assets/mark-dark.png" alt="" width="38" height="36"><img class="logo-img logo-text on-light" src="assets/text-light.png" alt="DiafaneAI" width="124" height="22"><img class="logo-img logo-text on-dark" src="assets/text-dark.png" alt="DiafaneAI" width="124" height="22"></a>
+    <nav class="links" aria-label="Sections"><a href="#problem" data-sec="problem" style="--acc:#5a3fd6;--tint:#e8e3fc">Problem</a><a href="#why-now" data-sec="why-now" style="--acc:#066aa3;--tint:#d9ecf8">Why now</a><a href="#how" data-sec="how" style="--acc:#0a7a59;--tint:#d5efe5">How it works</a><a href="#who" data-sec="who" style="--acc:#44770e;--tint:#e3efd3">Who it's for</a><a href="#team" data-sec="team" style="--acc:#066aa3;--tint:#d9ecf8">Team</a><a class="pill dark" href="#contact" data-sec="contact">Talk to us</a></nav>
+    <button type="button" class="mode-toggle" id="mode-toggle" aria-label="Switch to light mode"><svg class="sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg><svg class="moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
+  </div>
+  <div class="progress" aria-hidden="true"></div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div class="copy">
+        <h1>An audit trail<br><span class="g">for AI in GMP documents</span></h1>
+        <p class="lead">Quality teams are starting to use AI for SOPs, deviations and CAPAs. Regulators expect <b>qualified, accountable people</b>, not the AI, to approve the result. DiafaneAI is being built to show <b>where AI was used</b> and <b>who decided</b>.</p>
+        <div class="ctas">
+          <a class="pill dark" href="#contact">Share your QA experience <span class="dot" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5h6M5.5 2.5L8 5 5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+          <a class="pill light" href="#how">How it works</a>
+        </div>
+        <p class="stage">We are speaking with QA professionals to understand how AI is used in GMP documentation today. Your experience shapes what we build.</p>
+        <a class="scroll-cue" href="#example" aria-label="Scroll to the example"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 2v10M2.5 7.5L7 12l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+
+      <div class="stage-panel" id="example">
+        <figure class="doc">
+          <div class="card" role="img" aria-label="Example deviation report. Each section is marked as written by a person, by AI, or together. The root cause decision is signed by the QA manager.">
+            <div class="doc-head"><span><b>DEV-2026-0417</b> · Deviation investigation</span><span>Rev. 3 · In review</span></div>
+            <div class="sec human"><div class="bar"></div><div>
+              <div class="sec-top"><span class="sec-title">1 Event description</span><span class="lbl human">Person</span></div>
+              <p>During filling of batch 24-118, the in-process weight check on line 3 was above the upper limit for 12 minutes.</p>
+            </div></div>
+            <div class="sec joint"><div class="bar"></div><div>
+              <div class="sec-top"><span class="sec-title">2 Root cause</span><span class="lbl joint">Person + AI</span></div>
+              <p>Most likely cause: calibration drift of the check-weigher after the last maintenance.</p>
+            </div></div>
+            <div class="sec joint"><div class="bar"></div><div>
+              <div class="sec-top"><span class="sec-title">3 Impact assessment</span><span class="lbl joint">Person + AI</span></div>
+              <p>Affected units were identified and segregated. No other batches ran on line 3 in this period.</p>
+            </div></div>
+            <div class="decision">
+              <div><b>Root cause proposed by the QA Specialist, approved by the QA Manager</b><span class="m">Option 2 of 3 suggested by AI · e-signed "Approved" · 14.10.2026, 14:32</span></div>
+              <span class="lbl human">Human decision</span>
+            </div>
+          </div>
+          <figcaption>Example of the planned product. Names and numbers are made up.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="s band" id="problem" style="--acc:#5a3fd6;--tint:#e8e3fc;--band:#f5f3fe">
+    <div class="wrap">
+      <div class="s-head">
+        <span class="sec-label">Problem</span>
+        <h2>Traceability breaks<br><span class="g">when AI writes along</span></h2>
+        <p class="lead">A GMP document has to show who created or changed what, when and why. When someone drafts a root cause analysis with ChatGPT or Copilot, three things go missing from the record.</p>
+      </div>
+
+      <div class="icons">
+        <div class="icon-item">
+          <span class="ic" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.4 10.4 0 0 1 12 5c5 0 9 4.5 10 7a12.5 12.5 0 0 1-3 4.1M6.3 6.3C4 7.8 2.6 10 2 12c1 2.5 5 7 10 7 1.8 0 3.4-.5 4.8-1.3"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></span>
+          <h3>AI use goes unrecorded</h3>
+          <p>When text comes from a chat window or an AI assistant, the final document often shows no trace of it.</p>
+        </div>
+        <div class="icon-item">
+          <span class="ic" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M10 13a2 2 0 1 1 2.8 1.8c-.5.3-.8.7-.8 1.2"/><path d="M12 18.5h.01"/></svg></span>
+          <h3>The origin of text is unclear</h3>
+          <p>It is often impossible to tell which parts a person wrote, which came from AI, and which were written together.</p>
+        </div>
+        <div class="icon-item">
+          <span class="ic" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6.5 7-6.5 1.4 0 2.6.3 3.6.8"/><path d="M16 15l2 2 4-4" opacity=".35"/><path d="M18 21v.01M18 13.5v4"/></svg></span>
+          <h3>The decision is unclear</h3>
+          <p>Did the person leading the investigation choose the root cause, or accept the first AI suggestion without checking it?</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <figure>
+          <div class="compare">
+            <div class="card">
+              <span class="k">Today</span>
+              <p class="text">The deviation was most likely caused by a calibration drift of the check-weigher. As a corrective action, the calibration interval will be shortened from 12 to 6 months.</p>
+              <div class="qs"><span>Who wrote this?</span><span>Was it checked?</span><span>Who chose the corrective action?</span></div>
+            </div>
+            <div class="card">
+              <span class="k">With DiafaneAI</span>
+              <p class="text"><mark class="j">The deviation was most likely caused by a calibration drift of the check-weigher.</mark> <mark class="a">As a corrective action,</mark> <mark class="h">the calibration interval will be shortened from 12 to 6 months.</mark></p>
+              <div class="legend"><span class="lbl human">Person</span><span class="lbl joint">Together</span><span class="lbl ai">AI</span></div>
+              <p class="sign">Corrective action chosen by the QA Manager from 3 AI suggestions, e-signed "Approved".</p>
+            </div>
+          </div>
+        </figure>
+      </div>
+      <p class="after">Many companies hold back on AI in GMP documentation. Where it is used, it is often hard to show afterwards which parts came from AI and who decided.</p>
+    </div>
+  </section>
+
+  <section class="s band" id="why-now" style="--acc:#066aa3;--tint:#d9ecf8;--band:#f0f7fc">
+    <div class="wrap">
+      <div class="s-head">
+        <span class="sec-label">Why now</span>
+        <h2>The rules ask for traceability.<br><span class="g">Regulators are paying attention to AI.</span></h2>
+      </div>
+      <div class="card tbl" style="box-shadow:none">
+        <table>
+          <thead><tr><th>Requirement</th><th>What it means for AI use</th></tr></thead>
+          <tbody>
+            <tr><td>ALCOA+, EU GMP Annex 11, 21 CFR Part 11<sup class="ref"><a href="#src-3" aria-label="Source 3">3</a></sup><sup class="ref"><a href="#src-4" aria-label="Source 4">4</a></sup><sup class="ref"><a href="#src-5" aria-label="Source 5">5</a></sup></td><td>Records must show who (a person or a system) created or changed what, and when. EU GMP also asks why GMP-relevant data was changed. Once AI is involved, these questions become harder to answer.</td></tr>
+            <tr><td>Quality unit responsibility</td><td>The quality unit approves or rejects procedures, specifications, materials and products, and GMP documents are approved by authorised people. AI can support this work, but the company stays accountable for the integrity of records produced with AI.<sup class="ref"><a href="#src-1" aria-label="Source 1">1</a></sup><sup class="ref"><a href="#src-2" aria-label="Source 2">2</a></sup><sup class="ref"><a href="#src-8" aria-label="Source 8">8</a></sup></td></tr>
+            <tr><td>EU GMP Annex 22 (draft)</td><td>The first EU GMP annex dedicated to AI, published as a draft in July 2025 and not yet final. The draft keeps generative AI out of critical GMP uses, but the EMA is now reconsidering this and has discussed allowing it under a documented, risk-based control strategy.<sup class="ref"><a href="#src-6" aria-label="Source 6">6</a></sup><sup class="ref"><a href="#src-9" aria-label="Source 9">9</a></sup></td></tr>
+            <tr><td>FDA enforcement</td><td>In April 2026 the FDA cited a drug manufacturer whose quality unit had not reviewed specifications, procedures and master production records created with AI. The FDA stated that AI output or recommendations must be reviewed and cleared by an authorised person in the quality unit.<sup class="ref"><a href="#src-1" aria-label="Source 1">1</a></sup></td></tr>
+            <tr><td>Inspections</td><td>An HPRA GMP inspector said at the 2026 QP Forum in Dublin that inspectors may ask at the opening meeting whether AI is used in any GMP system or process.<sup class="ref"><a href="#src-7" aria-label="Source 7">7</a></sup></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="after">No rule yet requires labelling AI-written text. But if you use AI in GMP documentation today, be ready to show an inspector where AI was used and how people reviewed and approved the result.</p>
+    </div>
+  </section>
+
+  <section class="s band" id="how" style="--acc:#0a7a59;--tint:#d5efe5;--band:#eef8f4">
+    <div class="wrap">
+      <div class="s-head">
+        <span class="sec-label">How it works</span>
+        <h2>How DiafaneAI<br><span class="g">will make AI use traceable</span></h2>
+        <p class="lead">This is what we are building. Which parts come first depends on what we learn from QA teams.</p>
+      </div>
+
+      <div class="how">
+        <div class="panel">
+          <div class="txt">
+            <span class="step-no g">Step 1 · Record</span>
+            <h3>Capture AI use where people already work</h3>
+            <p>DiafaneAI is designed to capture AI use where people already work. Planned integrations include Microsoft Word and Copilot, AI chats such as ChatGPT, and eQMS platforms such as Veeva Vault, MasterControl and TrackWise Digital. It should work without extra clicks, and users are informed and can see what is recorded.</p>
+            <p>AI interactions in connected tools are logged with person, time, action and document section, in a secure audit trail that users cannot edit or switch off. Each section shows whether it was written by a person, came from a recorded AI suggestion, or was created by a person and AI together. AI use outside connected tools cannot be detected automatically.</p>
+          </div>
+          <figure>
+            <div class="card flow" role="img" aria-label="Word, AI chats and eQMS systems feed the DiafaneAI log">
+              <div class="src"><div>Word &amp; Copilot</div><div>ChatGPT and other AI chats</div><div>Veeva, MasterControl, TrackWise</div></div>
+              <span class="arr" aria-hidden="true"><svg width="24" height="14" viewBox="0 0 24 14"><path d="M1 7h20M15 1.5L21 7l-6 5.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <div class="log">
+                <b>DiafaneAI log</b>
+                <span>14:02 · AI draft inserted · QA Specialist · §2</span>
+                <span>14:09 · Text revised, 38 % changed · §2</span>
+                <span>14:32 · Signed "Approved" · QA Manager</span>
+              </div>
+            </div>
+          </figure>
+        </div>
+
+        <div class="panel rev">
+          <div class="txt">
+            <span class="step-no g">Step 2 · Decide</span>
+            <h3>Show who made the decision</h3>
+            <p>Inspectors hold people, not tools, responsible for GMP decisions. DiafaneAI will keep the prompt and the options the AI suggested, and record which one a person chose and which they rejected.</p>
+            <p>Edits to AI text are captured. The final approval is designed to use an electronic signature that meets 21 CFR Part 11 and EU GMP Annex 11, in DiafaneAI or in your existing eQMS. As with any GMP system, DiafaneAI will need to be validated for its intended use.</p>
+          </div>
+          <figure>
+            <div class="card record" role="img" aria-label="Decision record: the QA Specialist asked the AI for possible root causes, the AI suggested three, option B was chosen, and the QA manager signed it as approved">
+              <div class="rh"><b>Decision record · Root cause</b><span>DEV-2026-0417 §2</span></div>
+              <div class="prompt"><span class="pl">Prompt · QA Specialist · 14:01</span><p>"Deviation DEV-2026-0417: in-process weight check on line 3 above the upper limit for 12 minutes, shortly after maintenance. What are possible root causes? List them by likelihood."</p></div>
+              <div class="opts"><span class="pl">AI suggestions</span>
+                <div class="opt no"><span class="k">A</span><span>Operator error at line clearance</span><span class="st">Rejected</span></div>
+                <div class="opt yes"><span class="k">B</span><span>Calibration drift of check-weigher</span><span class="st">Chosen</span></div>
+                <div class="opt no"><span class="k">C</span><span>Variation in raw material density</span><span class="st">Rejected</span></div>
+              </div>
+              <ol>
+                <li><span class="t">14:01</span><span>Prompt sent by QA Specialist</span></li>
+                <li><span class="t">14:02</span><span>AI suggested 3 root causes</span></li>
+                <li><span class="t">14:09</span><span>B chosen by QA Specialist</span></li>
+                <li><span class="t">14:31</span><span>Re-read and revised by QA Manager</span></li>
+              </ol>
+              <div class="sg"><i>QA Manager</i><span>Approved · 14.10.2026, 14:32</span></div>
+            </div>
+          </figure>
+        </div>
+      </div>
+
+      <div class="later">
+        <div class="card">
+          <span class="tag">Later</span>
+          <h3>Inspection report</h3>
+          <p>One report per document for inspectors: what came from AI, who decided and who approved. Detailed prompts are not part of the standard report but remain available on request, under your data-integrity rules.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="s band" id="who" style="--acc:#44770e;--tint:#e3efd3;--band:#f4f8ec">
+    <div class="wrap">
+      <div class="s-head">
+        <span class="sec-label">Who it's for</span>
+        <h2>Built for pharma companies<br><span class="g">that want AI and inspection-readiness</span></h2>
+        <p class="lead">We are starting in Switzerland.</p>
+      </div>
+      <div class="aud">
+        <div class="panel">
+          <span class="role">Head of QA · QA Manager</span>
+          <h3>Pharmaceutical manufacturers</h3>
+          <p>Use AI in GMP documentation with a clear record you can show inspectors.</p>
+        </div>
+        <div class="panel">
+          <span class="role">Head of QA · Quality Manager</span>
+          <h3>Contract manufacturers</h3>
+          <p>Also show your clients that AI is used under control.</p>
+        </div>
+      </div>
+      <p class="users">Day to day, DiafaneAI is designed for the people who write and review GMP documents in QA, QC and production.</p>
+      <p class="users"><a class="inline-link" href="#shape">Register your company's interest →</a></p>
+    </div>
+  </section>
+
+  <section class="s band" id="shape" style="--acc:#5a3fd6;--tint:#e8e3fc;--band:#f5f3fe">
+    <div class="wrap shape-grid">
+      <div class="shape-copy">
+        <span class="sec-label">For companies</span>
+        <h2>Shape our product<br><span class="g">with your ideas</span></h2>
+        <p class="lead">Is your company interested in using AI in GMP documentation in a traceable way? Let us know. Your input helps us understand what matters in practice.</p>
+        <ul class="perks">
+          <li><b>Share your perspective.</b> Tell us what your QA team needs and where AI use is hard to document today.</li>
+          <li><b>Hear from us, if you like.</b> We may get in touch with questions or occasional updates.</li>
+          <li><b>Non-binding for both sides.</b> Registering creates no obligation for your company or for us.</li>
+        </ul>
+      </div>
+      <form class="card shape-form" id="interest-form" novalidate>
+        <h3>Register your company's interest</h3>
+        <div class="f-row">
+          <div class="f"><label for="f-company">Company</label><input id="f-company" name="company" autocomplete="organization" required></div>
+          <div class="f"><label for="f-type">Type of company</label>
+            <div class="sel-wrap"><select id="f-type" name="type"><option>Pharma manufacturer</option><option>CDMO</option><option>Other</option></select></div></div>
+        </div>
+        <div class="f-row">
+          <div class="f"><label for="f-name">Your name</label><input id="f-name" name="name" autocomplete="name" required></div>
+          <div class="f"><label for="f-role">Your role</label><input id="f-role" name="role" autocomplete="organization-title" placeholder="e.g. Head of QA"></div>
+        </div>
+        <div class="f"><label for="f-email">Work email</label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
+        <fieldset class="f">
+          <legend>What are you interested in?</legend>
+          <label class="chk"><input type="checkbox" id="f-i1" name="interest" value="A conversation about our needs" checked> A conversation about our needs</label>
+          <label class="chk"><input type="checkbox" id="f-i3" name="interest" value="Occasional email updates"> Occasional email updates (you can unsubscribe at any time)</label>
+        </fieldset>
+        <div class="f"><label for="f-msg">Anything you would like to tell us? <span class="opt-l">(optional)</span></label><textarea id="f-msg" name="message" rows="3"></textarea></div>
+        <p class="f-error" id="f-error" hidden>Please fill in company, name and a valid work email.</p>
+        <button type="submit" class="pill dark f-submit">Register interest <span class="dot" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5h6M5.5 2.5L8 5 5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+        <p class="f-note">Registering is non-binding. It does not create any agreement, and we cannot guarantee a reply, access or a specific product. How we handle your data is explained in our <a href="privacy.html">privacy statement</a>.</p>
+        <p class="f-note" id="f-note">This opens your email program with a prepared message to <span class="sel" data-contact-email>contact@diafaneai.com</span>. Nothing is sent until you press send.</p>
+        <p class="f-done" id="f-done" hidden>Your email program should now show the prepared message. If nothing opened, please write to <span class="sel" data-contact-email>contact@diafaneai.com</span>.</p>
+      </form>
+    </div>
+  </section>
+
+  <section class="s band" id="team" style="--acc:#066aa3;--tint:#d9ecf8;--band:#f0f7fc">
+    <div class="wrap">
+      <div class="s-head">
+        <span class="sec-label">Team</span>
+        <h2>Who we are</h2>
+        <p class="lead">We met at MIT and started DiafaneAI to make AI use in GMP documentation traceable.</p>
+      </div>
+      <div class="team">
+        <div class="panel">
+          <div class="photo has-img"><img src="assets/team-1.jpg" alt="Portrait of Sinia Gloor" width="600" height="600" loading="lazy"></div>
+          <div>
+            <h3>Sinia</h3>
+            <span class="role">Co-founder · Environmental engineer</span>
+            <p>I’m an environmental engineer with experience in industry projects and international applied research. As an engineer, I’m driven by solving real-world problems. I’ve learned to connect disciplines and design solutions that work outside the lab.</p>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="photo has-img"><img src="assets/team-2.jpg" alt="Portrait of Manuel Meinhardt" width="600" height="600" loading="lazy"></div>
+          <div>
+            <h3>Manuel</h3>
+            <span class="role">Co-founder · Chemical and Bioengineer</span>
+            <p>I’m a Chemical and Bioengineer from ETH Zurich and wrote my master’s thesis at MIT. I enjoy working where science, industry and people meet. I want to build tools that make complex processes clear and trustworthy.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="closing band dark" id="contact">
+    <div class="wrap">
+      <div class="copy">
+        <h2>We would like to learn from you.<br><span class="g">Help shape DiafaneAI.</span></h2>
+        <p class="lead">If you write, review or approve GMP documents, your view helps us build something that works in real QA work. A conversation takes about 15 minutes. It is about your experience, not about our product.</p>
+        <div class="confid">
+          <span>We are interested in your personal view of how things work in practice, not in your company's internal details. Please only share what you are free to share.</span>
+        </div>
+        <a class="pill dark" href="#contact" data-open-contact>Talk to us <span class="dot" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5h6M5.5 2.5L8 5 5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+        <p class="mail-line">Or write to <span class="sel">contact@diafaneai.com</span></p>
+      </div>
+    </div>
+  </section>
+  <section class="sources" id="sources">
+    <div class="wrap">
+      <h2>Sources</h2>
+      <p class="muted-note">Numbers in the Why now section refer to the sources below. All links checked in October 2026.</p>
+      <ol class="src-list"><li id="src-1"><span class="n">1</span><div><b>U.S. FDA</b>, Warning Letter to Purolea Cosmetics Lab (MARCS-CMS 722591). <span class="d">2 April 2026.</span><br><a href="https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/purolea-cosmetics-lab-722591-04022026" target="_blank" rel="noopener">www.fda.gov</a></div></li><li id="src-2"><span class="n">2</span><div><b>U.S. Code of Federal Regulations</b>, 21 CFR 211.22: Responsibilities of quality control unit. <span class="d">current version.</span><br><a href="https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-211/subpart-B/section-211.22" target="_blank" rel="noopener">www.ecfr.gov</a></div></li><li id="src-3"><span class="n">3</span><div><b>PIC/S</b>, PI 041-1: Good Practices for Data Management and Integrity in Regulated GMP/GDP Environments (ALCOA+). <span class="d">2021.</span><br><a href="https://picscheme.org/docview/4234" target="_blank" rel="noopener">picscheme.org</a></div></li><li id="src-4"><span class="n">4</span><div><b>European Commission</b>, EudraLex Volume 4, Annex 11: Computerised Systems. <span class="d">2011.</span><br><a href="https://health.ec.europa.eu/system/files/2016-11/annex11_01-2011_en_0.pdf" target="_blank" rel="noopener">health.ec.europa.eu</a></div></li><li id="src-5"><span class="n">5</span><div><b>U.S. Code of Federal Regulations</b>, 21 CFR Part 11: Electronic Records; Electronic Signatures. <span class="d">current version.</span><br><a href="https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11" target="_blank" rel="noopener">www.ecfr.gov</a></div></li><li id="src-6"><span class="n">6</span><div><b>European Commission</b>, Draft EudraLex Volume 4, Annex 22: Artificial Intelligence (stakeholder consultation, not final). <span class="d">July 2025.</span><br><a href="https://health.ec.europa.eu/consultations/stakeholders-consultation-eudralex-volume-4-good-manufacturing-practice-guidelines-chapter-4-annex_en" target="_blank" rel="noopener">health.ec.europa.eu</a></div></li><li id="src-7"><span class="n">7</span><div><b>HPRA (Ireland)</b>, Q&amp;A presentation by an HPRA GMP inspector at the QP Forum 2026, Trinity College Dublin. <span class="d">May 2026.</span><br><a href="https://www.tcd.ie/media/tcd/pharmacy/images/qp-forums/qp-forum-2026/presentations/9.3-HPRA-QA.pdf" target="_blank" rel="noopener">www.tcd.ie</a></div></li><li id="src-8"><span class="n">8</span><div><b>European Commission</b>, Draft EudraLex Volume 4, Chapter 4: Documentation, section 4.24 on AI-generated records (stakeholder consultation, not final). <span class="d">July 2025.</span><br><a href="https://health.ec.europa.eu/document/download/fa336a6e-753b-46fc-b53b-9178bacd8878_en?filename=mp_vol4_chap4_consultation_guideline_en.pdf" target="_blank" rel="noopener">health.ec.europa.eu</a></div></li><li id="src-9"><span class="n">9</span><div><b>European Medicines Agency (EMA)</b>, Report: Multistakeholder workshop on expert contributions to artificial intelligence guidance development (Annex 22), EMA/156789/2026. <span class="d">Workshop held 30 June 2026.</span><br><a href="https://www.ema.europa.eu/en/documents/report/report-multistakeholder-workshop-expert-contributions-artificial-intelligence-guidance-development-annex-22_en.pdf" target="_blank" rel="noopener">www.ema.europa.eu</a></div></li></ol>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="foot-brand"><img class="logo-img logo-mark on-light" src="assets/mark-light.png" alt="" width="26" height="25"><img class="logo-img logo-mark on-dark" src="assets/mark-dark.png" alt="" width="26" height="25"><img class="logo-img logo-text on-light" src="assets/text-light.png" alt="DiafaneAI" width="90" height="16"><img class="logo-img logo-text on-dark" src="assets/text-dark.png" alt="DiafaneAI" width="90" height="16"></span>
+    <span>© 2026 DiafaneAI · Switzerland</span>
+    <nav aria-label="Legal"><a href="#sources">Sources</a><a href="imprint.html">Imprint</a><a href="privacy.html">Privacy</a></nav>
+  </div>
+  <div class="wrap tm-note">DiafaneAI is a project by private individuals and not a registered company. Information on regulations on this website is for general information only and is not legal or regulatory advice. DiafaneAI is not affiliated with, endorsed by, sponsored by or otherwise connected to any company, organisation, regulatory authority or government named on this website. Microsoft Word, Copilot, ChatGPT, Veeva, MasterControl and TrackWise are trademarks of their respective owners. References to regulators and their publications are for information only.</div>
+</footer>
+
+<script>
+(function () {
+  var ids = ['problem', 'why-now', 'how', 'who', 'contact'];
+  var secs = ids.map(function (id) { return document.getElementById(id); });
+  var links = {};
+  document.querySelectorAll('nav.links a[data-sec]').forEach(function (a) { links[a.getAttribute('data-sec')] = a; });
+  var nav = document.querySelector('nav.links');
+  var bar = document.querySelector('.progress');
+  var header = document.querySelector('header.top');
+  var current = null, ticking = false;
+  function update() {
+    ticking = false;
+    var offset = (header ? header.offsetHeight : 70) + 40;
+    var active = null;
+    secs.forEach(function (sec, i) { if (sec && sec.getBoundingClientRect().top <= offset) active = ids[i]; });
+    var doc = document.documentElement;
+    var max = doc.scrollHeight - window.innerHeight;
+    if (max > 0 && window.scrollY >= max - 4) active = 'contact';
+    if (bar) bar.style.width = (max > 0 ? Math.min(100, window.scrollY / max * 100) : 0) + '%';
+    if (active === current) return;
+    current = active;
+    Object.keys(links).forEach(function (k) {
+      var on = k === active;
+      links[k].classList.toggle('active', on);
+      if (on) links[k].setAttribute('aria-current', 'location'); else links[k].removeAttribute('aria-current');
+    });
+    if (active && nav && nav.scrollWidth > nav.clientWidth) {
+      var a = links[active];
+      nav.scrollTo({ left: a.offsetLeft - nav.clientWidth / 2 + a.offsetWidth / 2, behavior: 'smooth' });
+    }
+  }
+  window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+})();
+</script>
+
+<div class="cx" id="contact-window" role="dialog" aria-modal="true" aria-labelledby="cx-title" hidden>
+  <div class="cx-box">
+    <button type="button" class="cx-close" data-cx-close aria-label="Close"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+    <h2 id="cx-title">Talk to us<br><span class="g">15 minutes to hear your view.</span></h2>
+    <p>We are talking to QA professionals to understand how AI is used in GMP documentation. Tell us what challenges you see in the industry and how a product could help.</p>
+    <p class="cx-conf">We are interested in your personal view of how things work in practice, not in your company's internal details. Please only share what you are free to share.</p>
+    <p class="cx-conf">How we handle your data is explained in our <a href="privacy.html">privacy statement</a>.</p>
+    <div class="cx-mail"><span id="cx-addr">contact@diafaneai.com</span><button type="button" id="cx-copy">Copy</button></div>
+    <div class="cx-actions"><a class="pill dark" href="mailto:contact@diafaneai.com">Write an email</a></div>
+  </div>
+</div>
+<script>
+(function () {
+  var win = document.getElementById('contact-window');
+  var last = null;
+  function open(e) {
+    if (e) e.preventDefault();
+    last = document.activeElement;
+    win.hidden = false;
+    document.body.style.overflow = 'hidden';
+    var c = win.querySelector('.cx-close'); if (c) c.focus();
+  }
+  function close() {
+    win.hidden = true;
+    document.body.style.overflow = '';
+    if (last && last.focus) last.focus({ preventScroll: true });
+  }
+  document.querySelectorAll('a[href="#contact"]').forEach(function (a) { a.addEventListener('click', open); });
+  win.addEventListener('click', function (e) { if (e.target === win || e.target.closest('[data-cx-close]')) close(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !win.hidden) close(); });
+  var cp = document.getElementById('cx-copy');
+  cp.addEventListener('click', function () {
+    var t = document.getElementById('cx-addr');
+    var done = function () { cp.textContent = 'Copied'; setTimeout(function () { cp.textContent = 'Copy'; }, 1600); };
+    var fb = function () { var r = document.createRange(); r.selectNodeContents(t); var sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); cp.textContent = 'Press Ctrl+C'; };
+    try { navigator.clipboard.writeText(t.textContent.trim()).then(done, fb); } catch (e) { fb(); }
+  });
+})();
+</script>
+<script>
+(function () {
+  var btn = document.getElementById('mode-toggle');
+  var css = document.getElementById('dark-css');
+  if (!btn || !css) return;
+  function apply(mode) {
+    css.disabled = mode === 'light';
+    document.documentElement.classList.toggle('is-dark', mode !== 'light');
+    btn.setAttribute('aria-label', mode === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
+    btn.title = btn.getAttribute('aria-label');
+  }
+  apply(css.disabled ? 'light' : 'dark');
+  btn.addEventListener('click', function () {
+    var next = css.disabled ? 'dark' : 'light';
+    apply(next);
+    try { localStorage.setItem('diafane-mode', next); } catch (e) {}
+  });
+})();
+</script>
+
+<script>
+(function () {
+  var CONTACT_EMAIL = 'contact@diafaneai.com';
+  document.querySelectorAll('[data-contact-email]').forEach(function (el) { el.textContent = CONTACT_EMAIL; });
+  var form = document.getElementById('interest-form');
+  if (!form) return;
+  var err = document.getElementById('f-error'), done = document.getElementById('f-done'), note = document.getElementById('f-note');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = function (id) { return (document.getElementById(id).value || '').trim(); };
+    var company = v('f-company'), name = v('f-name'), email = v('f-email');
+    var ok = true;
+    [['f-company', company], ['f-name', name], ['f-email', /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) ? email : '']].forEach(function (p) {
+      var el = document.getElementById(p[0]); if (!p[1]) { ok = false; el.setAttribute('aria-invalid', 'true'); } else el.removeAttribute('aria-invalid');
+    });
+    err.hidden = ok;
+    if (!ok) { form.querySelector('[aria-invalid="true"]').focus(); return; }
+    var interests = Array.prototype.slice.call(form.querySelectorAll('input[name="interest"]:checked')).map(function (c) { return '- ' + c.value; });
+    var body = ['Company: ' + company, 'Type: ' + v('f-type'), 'Name: ' + name, 'Role: ' + (v('f-role') || '-'), 'Email: ' + email, '',
+      'Interested in:', interests.length ? interests.join('\n') : '- not specified', '', 'Message:', v('f-msg') || '-'].join('\n');
+    var href = 'mailto:' + CONTACT_EMAIL + '?subject=' + encodeURIComponent('Company interest: ' + company) + '&body=' + encodeURIComponent(body);
+    window.location.href = href;
+    done.hidden = false; note.hidden = true;
+  });
+})();
+</script>
+
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "7d0f51f55e9e4597a020e167a691ca8f"}'></script><!-- End Cloudflare Web Analytics -->
+</body>
+</html>
