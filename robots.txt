@@ -1,0 +1,19 @@
+# KI-Training: gesamte Website gesperrt
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: anthropic-ai
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: CCBot
+User-agent: meta-externalagent
+User-agent: Bytespider
+User-agent: Amazonbot
+Disallow: /
+
+# Alle anderen (Google, Bing usw.): Website erlaubt, Teamfotos gesperrt
+User-agent: *
+Disallow: /assets/team-1.jpg
+Disallow: /assets/team-2.jpg
+Allow: /
+
+Sitemap: https://diafaneai.com/sitemap.xml
