@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>DiafaneAI – Audit trail for AI in GMP documentation</title>
-<link rel="icon" type="image/png" href="assets/favicon.png" media="(prefers-color-scheme: light)">
-<link rel="icon" type="image/png" href="assets/favicon-dark.png" media="(prefers-color-scheme: dark)">
-<meta name="description" content="DiafaneAI is an audit trail for AI use in GMP documentation. It records what AI contributed and shows who made each decision.">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" href="assets/favicon-192.png" sizes="192x192">
+<link rel="icon" type="image/png" href="assets/favicon-dark.png" sizes="64x64" media="(prefers-color-scheme: dark)">
+<meta name="description" content="We are building an audit trail for AI in GMP documentation. It shows where AI was used and who made each decision. Starting in Switzerland.">
 <style>
 /* Lato is served from this website (no Google Fonts). SIL Open Font License, see assets/fonts/OFL.txt */
 @font-face { font-family: "Lato"; font-style: normal; font-weight: 300; font-display: swap; src: url("assets/fonts/lato-latin-300-normal.woff2") format("woff2"); }
@@ -87,7 +88,10 @@ nav.links a:not(.pill):hover { color: var(--ink); }
 .hero .ctas { margin-top: 8px; }
 .hero .lead { margin: 0 auto; }
 .hero .ctas { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
-.hero .stage { font-size: .9rem; color: var(--ink-3); }
+.hero .invite { display: grid; gap: 6px; max-width: 640px; padding: 18px 24px; border-radius: 20px; border: 1px solid color-mix(in srgb, var(--blue) 30%, var(--line)); background: color-mix(in srgb, var(--bg) 72%, transparent); backdrop-filter: blur(6px); }
+.hero .invite p { font-size: 1.02rem; color: var(--ink-2); text-wrap: balance; }
+.hero .invite .invite-h { font-size: 1.3rem; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; line-height: 1.3; }
+@media (max-width: 640px) { .hero .invite { padding: 16px 18px; } .hero .invite .invite-h { font-size: 1.15rem; } }
 .stage-panel { margin-top: 0; background: var(--soft), var(--panel); border-radius: 28px; padding: clamp(20px, 5vw, 56px); display: grid; place-items: center; text-align: left; }
 @media (max-width: 900px) { .hero .copy { min-height: calc(100vh - 72px); min-height: calc(100svh - 72px); } }
 @media (max-width: 640px) { .hero { padding-block: 0 24px; } .hero .copy { gap: 26px; padding-block: 32px 72px; } .stage-panel { border-radius: 20px; } }
@@ -392,16 +396,16 @@ sup.ref a:hover { background: var(--blue); color: var(--bg); }
 
 /* ===== Hero motion: aurora background (.anim-b) and audit-trail ticker (.anim-d) ===== */
 :root { --aur-1: rgba(106,79,232,.24); --aur-2: rgba(7,132,201,.20); --aur-3: rgba(14,159,117,.18); --aur-4: rgba(92,157,19,.14); }
-.hero { overflow-x: clip; }
-.hero .copy { isolation: isolate; }
+.hero { overflow-x: clip; position: relative; isolation: isolate; }
 /* B: soft aurora behind the hero */
-.aurora { display: none; position: absolute; top: 0; bottom: 0; left: 50%; width: 100vw; margin-left: -50vw; overflow: hidden; pointer-events: none; z-index: -1; }
+.aurora { display: none; position: absolute; top: 0; bottom: 0; left: 50%; width: 100vw; margin-left: -50vw; overflow: hidden; pointer-events: none; z-index: -1; -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 70%, transparent 100%); mask-image: linear-gradient(to bottom, #000 0, #000 70%, transparent 100%); }
 .anim-b .aurora { display: block; }
 .aurora i { position: absolute; width: 42vmax; height: 42vmax; border-radius: 50%; filter: blur(64px); will-change: transform; }
-.aurora i:nth-child(1) { background: var(--aur-1); top: -18%; left: -6%; }
-.aurora i:nth-child(2) { background: var(--aur-2); top: 22%; right: -10%; }
-.aurora i:nth-child(3) { background: var(--aur-3); bottom: -26%; left: 26%; }
-.aurora i:nth-child(4) { background: var(--aur-4); top: 4%; left: 44%; width: 30vmax; height: 30vmax; }
+/* Positions in vh so the clouds stay in the first screen and the area around the example */
+.aurora i:nth-child(1) { background: var(--aur-1); top: -14vh; left: -6%; }
+.aurora i:nth-child(2) { background: var(--aur-2); top: 24vh; right: -10%; }
+.aurora i:nth-child(3) { background: var(--aur-3); top: 62vh; left: 26%; }
+.aurora i:nth-child(4) { background: var(--aur-4); top: 4vh; left: 44%; width: 30vmax; height: 30vmax; }
 /* D: live audit-trail ticker */
 .ticker { display: none; align-items: center; gap: 10px; padding: 8px 16px 8px 12px; border-radius: 100px; border: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 70%, transparent); font-size: .88rem; color: var(--ink-2); font-variant-numeric: tabular-nums; max-width: 100%; }
 .anim-d .ticker { display: inline-flex; }
@@ -509,17 +513,20 @@ section.s.band { background: linear-gradient(to bottom, var(--prev, var(--band))
 
 <main id="top">
   <section class="hero">
+    <div class="aurora" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     <div class="wrap">
       <div class="copy">
-        <div class="aurora" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
         <h1>An audit trail<br><span class="g">for AI in GMP&nbsp;documents</span></h1>
         <p class="lead">Quality teams are starting to use AI for SOPs, deviations and CAPAs. Regulators expect <b>qualified, accountable people</b>, not the AI, to approve the result. DiafaneAI is being built to show <b>where AI was used</b> and <b>who decided</b>.</p>
+        <div class="invite">
+          <p class="invite-h">Do you work in QA? We would like to hear from you.</p>
+          <p>We are talking with QA professionals about how AI is used in GMP documentation today. Tell us about your experience in a 15-minute conversation. It shapes what we build.</p>
+        </div>
         <div class="ctas">
           <a class="pill dark" href="#contact">Share your QA experience <span class="dot" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5h6M5.5 2.5L8 5 5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
           <a class="pill light" href="#how">How it works</a>
         </div>
         <div class="ticker" aria-hidden="true"><span class="live"></span><span class="tk-item"><span class="lbl human">Person</span><span class="tk-text">14:01 · Prompt sent · QA Specialist</span></span></div>
-        <p class="stage">We are speaking with QA professionals to understand how AI is used in GMP documentation today. Your experience shapes what we build.</p>
       </div>
 
       <div class="stage-panel" id="example">
