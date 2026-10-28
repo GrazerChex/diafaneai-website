@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Imprint · DiafaneAI</title>
 <meta name="robots" content="noindex">
-<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="icon" type="image/png" href="assets/favicon.png" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" href="assets/favicon-dark.png" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <style>
 @font-face { font-family: "Lato"; font-style: normal; font-weight: 300; font-display: swap; src: url("assets/fonts/lato-latin-300-normal.woff2") format("woff2"); }
 @font-face { font-family: "Lato"; font-style: normal; font-weight: 400; font-display: swap; src: url("assets/fonts/lato-latin-400-normal.woff2") format("woff2"); }
@@ -32,7 +34,7 @@ header { border-bottom: 1px solid var(--line); }
 header .wrap { max-width: 1160px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 18px; }
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
 .brand img { display: block; width: auto; }
-.mk { height: 36px; } .tx { height: 22px; }
+.lg { height: 34px; }
 .on-light { display: none !important; }
 html.light .on-light { display: block !important; } html.light .on-dark { display: none !important; }
 .back { color: var(--ink-2); text-decoration: none; font-size: .95rem; padding: 8px 14px; border: 1px solid var(--line); border-radius: 100px; white-space: nowrap; }
@@ -55,18 +57,18 @@ footer { border-top: 1px solid var(--line); padding-block: 26px; font-size: .88r
 footer .wrap { max-width: 1160px; display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
 footer nav { display: flex; gap: 20px; }
 footer a { color: inherit; text-decoration: none; } footer a:hover, footer a[aria-current] { color: var(--ink); }
+p, li { text-wrap: pretty; }
 :focus-visible { outline: 2px solid var(--link); outline-offset: 3px; border-radius: 4px; }
 </style>
 <script>
-(function () { var m = 'dark'; try { m = localStorage.getItem('diafane-mode') || 'dark'; } catch (e) {} if (m === 'light') document.documentElement.classList.add('light'); })();
+(function () { var m = null; try { m = sessionStorage.getItem('diafane-mode'); } catch (e) {} if (m !== 'dark' && m !== 'light') m = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; if (m === 'light') document.documentElement.classList.add('light'); })();
 </script>
 </head>
 <body>
 <header>
   <div class="wrap">
     <a class="brand" href="./" aria-label="DiafaneAI home">
-      <img class="mk on-dark" src="assets/mark-dark.png" alt="" width="38" height="36"><img class="mk on-light" src="assets/mark-light.png" alt="" width="38" height="36">
-      <img class="tx on-dark" src="assets/text-dark.png" alt="DiafaneAI" width="124" height="22"><img class="tx on-light" src="assets/text-light.png" alt="DiafaneAI" width="124" height="22">
+      <img class="lg on-dark" src="assets/logo-dark.png" alt="DiafaneAI" width="193" height="34"><img class="lg on-light" src="assets/logo-light.png" alt="DiafaneAI" width="193" height="34">
     </a>
     <a class="back" href="./">← Back to website</a>
   </div>
@@ -100,7 +102,7 @@ footer a { color: inherit; text-decoration: none; } footer a:hover, footer a[ari
 <footer>
   <div class="wrap">
     <span>© 2026 DiafaneAI · Switzerland</span>
-    <nav aria-label="Legal"><a href="imprint.html" aria-current="page">Imprint</a><a href="privacy.html">Privacy</a></nav>
+    <nav aria-label="Legal"><a href="https://www.linkedin.com/company/diafaneai/" target="_blank" rel="noopener">LinkedIn</a><a href="sources.html">Sources</a><a href="imprint.html" aria-current="page">Imprint</a><a href="privacy.html">Privacy</a></nav>
   </div>
 </footer>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "7d0f51f55e9e4597a020e167a691ca8f"}'></script><!-- End Cloudflare Web Analytics -->

@@ -1,11 +1,12 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="anim-b anim-d">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>DiafaneAI Website</title>
-<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="icon" type="image/png" href="assets/favicon.png" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" href="assets/favicon-dark.png" media="(prefers-color-scheme: dark)">
 <meta name="description" content="DiafaneAI is an audit trail for AI use in GMP documentation. It records what AI contributed and shows who made each decision.">
 <style>
 /* Lato is served from this website (no Google Fonts). SIL Open Font License, see assets/fonts/OFL.txt */
@@ -17,7 +18,7 @@
 
 /* Layout: airy, white, light-weight oversized headlines with a gradient second line.
    Content sits in large soft panels. The gradient runs human-blue -> together-teal -> AI-orange,
-   colours taken from the logo: violet, blue, teal, green. Dark mode is the default. */
+   colours taken from the logo: violet, blue, teal, green. The mode follows the computer's setting (light if unknown). */
 :root {
   color-scheme: light;
   --bg: #ffffff;
@@ -67,12 +68,12 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .brand svg { flex: none; }
 .logo-img { display: block; width: auto; }
 .brand { gap: 10px; }
-.logo-mark { height: 36px; } .logo-text { height: 22px; }
-@media (max-width: 640px) { .logo-mark { height: 31px; } }
+.logo-full { height: 34px; }
+@media (max-width: 640px) { .logo-full { height: 30px; } }
 .logo-img.on-dark { display: none; }
 html.is-dark .logo-img.on-dark { display: block; }
 html.is-dark .logo-img.on-light { display: none; }
-footer .foot-brand { gap: 7px; } footer .logo-mark { height: 25px; } footer .logo-text { height: 16px; }
+footer .logo-full { height: 24px; }
 
 nav.links { display: flex; align-items: center; gap: 28px; font-size: .95rem; }
 nav.links a:not(.pill) { text-decoration: none; color: var(--ink-2); }
@@ -81,17 +82,14 @@ nav.links a:not(.pill):hover { color: var(--ink); }
 
 /* Hero */
 .hero { padding-block: 0 48px; text-align: center; }
-.hero .copy { display: grid; justify-items: center; align-content: center; gap: 34px; min-height: calc(100vh - 80px); min-height: calc(100svh - 80px); padding-block: 48px 72px; position: relative; }
-.scroll-cue { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; color: var(--ink-3); text-decoration: none; }
-.scroll-cue:hover { color: var(--ink); }
-@media (prefers-reduced-motion: no-preference) { .scroll-cue svg { animation: cue 2.4s ease-in-out infinite; } @keyframes cue { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(3px); } } }
+.hero .copy { display: grid; justify-items: center; align-content: center; gap: 34px; min-height: calc(100vh - 40px); min-height: calc(100svh - 40px); padding-block: 48px 72px; position: relative; }
 .hero .copy h1 { margin-bottom: 6px; }
 .hero .ctas { margin-top: 8px; }
 .hero .lead { margin: 0 auto; }
 .hero .ctas { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 .hero .stage { font-size: .9rem; color: var(--ink-3); }
 .stage-panel { margin-top: 0; background: var(--soft), var(--panel); border-radius: 28px; padding: clamp(20px, 5vw, 56px); display: grid; place-items: center; text-align: left; }
-@media (max-width: 900px) { .hero .copy { min-height: calc(100vh - 112px); min-height: calc(100svh - 112px); } }
+@media (max-width: 900px) { .hero .copy { min-height: calc(100vh - 72px); min-height: calc(100svh - 72px); } }
 @media (max-width: 640px) { .hero { padding-block: 0 24px; } .hero .copy { gap: 26px; padding-block: 32px 72px; } .stage-panel { border-radius: 20px; } }
 
 /* Section scaffolding */
@@ -147,7 +145,8 @@ mark.a { background: var(--ai-bg); box-shadow: inset 0 -2px 0 var(--ai); }
 mark.j { background: var(--joint-bg); box-shadow: inset 0 -2px 0 var(--joint); }
 .legend { display: flex; gap: 8px; flex-wrap: wrap; }
 @media (max-width: 760px) { .compare { grid-template-columns: 1fr; } }
-.after { margin-top: 40px; font-size: 1.5rem; font-weight: 300; letter-spacing: -0.015em; line-height: 1.35; max-width: 34ch; }
+.after { margin-top: 40px; font-size: 1.5rem; font-weight: 300; letter-spacing: -0.015em; line-height: 1.35; max-width: 70ch; }
+@media (max-width: 640px) { .after { font-size: 1.2rem; } }
 
 /* Why now table */
 .tbl { overflow-x: auto; }
@@ -210,13 +209,22 @@ td:last-child { color: var(--ink-2); }
 /* Audience */
 /* Team */
 .team { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.team .panel { display: grid; grid-template-columns: 132px 1fr; gap: 24px; align-items: start; }
+.team .panel { display: grid; grid-template-columns: 132px 1fr; gap: 24px; align-items: stretch; }
+.team .panel > .photo { align-self: start; }
+.team .panel > div:last-child { display: flex; flex-direction: column; }
 .team .photo { width: 132px; aspect-ratio: 1; border-radius: 22px; border: 1.5px dashed color-mix(in srgb, var(--acc) 55%, transparent); background: color-mix(in srgb, var(--tint) 60%, transparent); display: grid; place-items: center; align-content: center; gap: 6px; color: var(--acc); font-size: .78rem; }
 .team .photo.has-img { border: 0; background: none; }
 .team .photo img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
 .team h3 { font-size: 1.5rem; font-weight: 300; letter-spacing: -0.02em; }
 .team .role { font-size: .9rem; color: var(--ink-3); display: block; margin: 4px 0 12px; }
 .team p { color: var(--ink-2); }
+.team .t-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 16px; }
+.team .t-links a.li svg { color: #0a66c2; }
+html.is-dark .team .t-links a.li svg { color: #fff; }
+.team .t-links a { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 100px; border: 1px solid color-mix(in srgb, var(--acc) 30%, var(--line)); color: var(--ink-2); font-size: .88rem; font-weight: 700; text-decoration: none; transition: background-color .2s, color .2s; min-width: 0; }
+.team .t-links a svg { flex: none; color: var(--acc); }
+.team .t-links a span { overflow-wrap: anywhere; }
+.team .t-links a:hover { background: var(--tint); color: var(--ink); }
 .ph-t { background: color-mix(in srgb, var(--acc) 16%, transparent); border-radius: 6px; padding: 0 4px; }
 @media (max-width: 900px) { .team { grid-template-columns: 1fr; } }
 @media (max-width: 480px) { .team .panel { grid-template-columns: 1fr; } }
@@ -247,7 +255,8 @@ footer a:hover { color: var(--ink); }
 
 /* Section bands and orientation */
 section[id] { scroll-margin-top: 76px; }
-section.s.band { background: var(--band); padding-block: 96px; }
+section.s.band { --fade: 4cm; background: linear-gradient(to bottom, var(--prev, var(--band)) 0, var(--band) var(--fade)); padding-block: 96px; }
+#problem { --prev: #ffffff; } #why-now { --prev: #f5f3fe; } #how { --prev: #f0f7fc; } #who { --prev: #eef8f4; } #shape { --prev: #f4f8ec; } #team { --prev: #f5f3fe; }
 @media (max-width: 640px) { section.s.band { padding-block: 64px; } section[id] { scroll-margin-top: 112px; } }
 .band .panel { background: rgba(255,255,255,.62); border: 1px solid rgba(255,255,255,.95); }
 .band .card { border-color: color-mix(in srgb, var(--acc) 14%, var(--line)); }
@@ -256,6 +265,13 @@ section.s.band { background: var(--band); padding-block: 96px; }
 .band .g { background: var(--grad); -webkit-background-clip: text; background-clip: text; }
 .band .ic { border-color: color-mix(in srgb, var(--acc) 25%, var(--line)); }
 .closing.dark { background: #0c0f12; color: #fff; }
+/* Light mode: Talk to us in the brand gradient */
+/* Soft eased fade from the Team band over 6 cm; alpha steps chosen so perceived lightness (OKLab) falls along a smootherstep curve */
+html:not(.is-dark) .closing.dark { background: linear-gradient(to bottom, rgba(240,247,252,1.000) 0.00cm, rgba(240,247,252,0.999) 0.25cm, rgba(240,247,252,0.995) 0.50cm, rgba(240,247,252,0.984) 0.75cm, rgba(240,247,252,0.965) 1.00cm, rgba(240,247,252,0.937) 1.25cm, rgba(240,247,252,0.899) 1.50cm, rgba(240,247,252,0.852) 1.75cm, rgba(240,247,252,0.796) 2.00cm, rgba(240,247,252,0.732) 2.25cm, rgba(240,247,252,0.663) 2.50cm, rgba(240,247,252,0.590) 2.75cm, rgba(240,247,252,0.514) 3.00cm, rgba(240,247,252,0.438) 3.25cm, rgba(240,247,252,0.363) 3.50cm, rgba(240,247,252,0.292) 3.75cm, rgba(240,247,252,0.225) 4.00cm, rgba(240,247,252,0.166) 4.25cm, rgba(240,247,252,0.114) 4.50cm, rgba(240,247,252,0.072) 4.75cm, rgba(240,247,252,0.040) 5.00cm, rgba(240,247,252,0.018) 5.25cm, rgba(240,247,252,0.006) 5.50cm, rgba(240,247,252,0.001) 5.75cm, rgba(240,247,252,0.000) 6.00cm), linear-gradient(120deg, #5a3fd6 0%, #0670ad 45%, #0b8461 100%); padding-top: calc(7.5cm + 48px); }
+@media (max-width: 640px) { html:not(.is-dark) .closing.dark { padding-top: calc(7.5cm + 24px); } }
+html:not(.is-dark) .closing.dark .g { background: none; -webkit-text-fill-color: #fff; color: #fff; }
+html:not(.is-dark) .closing.dark .lead { color: rgba(255,255,255,.9); }
+html:not(.is-dark) .closing.dark .mail-line { color: rgba(255,255,255,.85); }
 .closing.dark .lead { color: rgba(255,255,255,.72); }
 .closing.dark .pill.dark, html.is-dark .closing.dark .pill.dark { background: #fff; color: #141414; }
 
@@ -297,13 +313,17 @@ sup.ref a:hover { background: var(--blue); color: var(--bg); }
 .sources { padding-block: 72px; border-top: 1px solid var(--line); scroll-margin-top: 80px; }
 .sources h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
 .sources .muted-note { color: var(--ink-3); font-size: .9rem; margin: 10px 0 28px; }
-.src-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px 40px; }
+.src-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 40px; }
 .src-list li { display: grid; grid-template-columns: 30px 1fr; gap: 12px; font-size: .92rem; color: var(--ink-2); scroll-margin-top: 90px; padding: 10px; margin: -10px; border-radius: 12px; min-width: 0; }
 .src-list li:target { background: var(--panel); outline: 1px solid var(--line); }
 .src-list .n { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: .8rem; color: var(--blue); border: 1px solid var(--line); }
 .src-list b { color: var(--ink); }
 .src-list .d { color: var(--ink-3); }
-.src-list a { color: var(--blue); word-break: break-word; }
+.src-list a { color: var(--ink-2); text-decoration: none; min-width: 0; align-self: center; }
+.src-list a:hover b { color: var(--blue); }
+.src-list a:hover { color: var(--ink); }
+.sources .src-all { color: var(--blue); font-weight: 700; text-decoration: none; white-space: nowrap; }
+.sources .src-all:hover { text-decoration: underline; }
 @media (max-width: 760px) { .src-list { grid-template-columns: 1fr; } }
 
 /* Company interest form */
@@ -342,6 +362,7 @@ sup.ref a:hover { background: var(--blue); color: var(--bg); }
 .topics span { color: rgba(255,255,255,.72); font-size: .95rem; }
 .mail-line { color: rgba(255,255,255,.6); font-size: .9rem; }
 .mail-line .sel { color: #fff; user-select: all; }
+.mail-line .mail-li { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
 @media (max-width: 820px) { .topics { grid-template-columns: 1fr; } }
 .confid { max-width: 640px; width: 100%; display: grid; gap: 6px; text-align: left; padding: 18px 22px; border-radius: 18px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); position: relative; overflow: hidden; }
 .confid b { color: #fff; }
@@ -368,6 +389,47 @@ sup.ref a:hover { background: var(--blue); color: var(--bg); }
 .cx-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .cx-box .pill.dark { justify-self: start; }
 @media (prefers-reduced-motion: no-preference) { .cx-box { animation: cxin .22s ease both; } @keyframes cxin { from { transform: translateY(10px); opacity: .001; } to { transform: none; opacity: 1; } } }
+
+/* ===== Hero motion: aurora background (.anim-b) and audit-trail ticker (.anim-d) ===== */
+:root { --aur-1: rgba(106,79,232,.24); --aur-2: rgba(7,132,201,.20); --aur-3: rgba(14,159,117,.18); --aur-4: rgba(92,157,19,.14); }
+.hero { overflow-x: clip; }
+.hero .copy { isolation: isolate; }
+/* B: soft aurora behind the hero */
+.aurora { display: none; position: absolute; top: 0; bottom: 0; left: 50%; width: 100vw; margin-left: -50vw; overflow: hidden; pointer-events: none; z-index: -1; }
+.anim-b .aurora { display: block; }
+.aurora i { position: absolute; width: 42vmax; height: 42vmax; border-radius: 50%; filter: blur(64px); will-change: transform; }
+.aurora i:nth-child(1) { background: var(--aur-1); top: -18%; left: -6%; }
+.aurora i:nth-child(2) { background: var(--aur-2); top: 22%; right: -10%; }
+.aurora i:nth-child(3) { background: var(--aur-3); bottom: -26%; left: 26%; }
+.aurora i:nth-child(4) { background: var(--aur-4); top: 4%; left: 44%; width: 30vmax; height: 30vmax; }
+/* D: live audit-trail ticker */
+.ticker { display: none; align-items: center; gap: 10px; padding: 8px 16px 8px 12px; border-radius: 100px; border: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 70%, transparent); font-size: .88rem; color: var(--ink-2); font-variant-numeric: tabular-nums; max-width: 100%; }
+.anim-d .ticker { display: inline-flex; }
+.ticker .live { width: 8px; height: 8px; border-radius: 50%; background: var(--joint); flex: none; box-shadow: 0 0 0 0 color-mix(in srgb, var(--joint) 60%, transparent); }
+.ticker .tk-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.ticker .lbl { flex: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .aurora i:nth-child(1) { animation: drift1 8s ease-in-out infinite alternate; }
+  .aurora i:nth-child(2) { animation: drift2 9s ease-in-out infinite alternate; }
+  .aurora i:nth-child(3) { animation: drift3 10s ease-in-out infinite alternate; }
+  .aurora i:nth-child(4) { animation: drift4 7s ease-in-out infinite alternate; }
+  @keyframes drift1 { 50% { transform: translate(22vw, 18vh) scale(1.2); } 100% { transform: translate(40vw, -4vh) scale(.95); } }
+  @keyframes drift2 { 50% { transform: translate(-30vw, -14vh) scale(.85); } 100% { transform: translate(-12vw, 20vh) scale(1.15); } }
+  @keyframes drift3 { 50% { transform: translate(-24vw, -22vh) scale(1.25); } 100% { transform: translate(18vw, -30vh) scale(1); } }
+  @keyframes drift4 { 50% { transform: translate(-26vw, 26vh) scale(1.3); } 100% { transform: translate(14vw, 34vh) scale(.9); } }
+  .ticker .live { animation: pulse 2s ease-out infinite; }
+  @keyframes pulse { 70% { box-shadow: 0 0 0 8px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+  .ticker .tk-item { animation: tkin .45s ease both; }
+  @keyframes tkin { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+}
+.ticker .tk-item { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
+
+/* Line breaking: no single word alone on the last line */
+p, li, td, th, figcaption, .role, .opt span, .record ol span { text-wrap: pretty; }
+.lead, .after, .users, .mail-line, .s-head p, .closing p, .cx-box p { text-wrap: balance; }
+h1 .g, h2 .g, .sec p, .compare .sign, .decision span.m, figcaption { text-wrap: balance; }
+@media (max-width: 640px) { .lead, .closing p { text-wrap: pretty; } }
+.nw { white-space: nowrap; }
 </style>
 <style id="dark-css">
 /* ===== Dark edition ===== */
@@ -401,6 +463,7 @@ nav.links .pill.active { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px #fff; }
 .band .panel { background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.07); }
 .hero h1 { text-shadow: none; }
 .closing.dark { background: radial-gradient(90% 120% at 50% 110%, rgba(106,79,232,.30) 0%, rgba(7,132,201,.12) 35%, rgba(7,7,13,0) 70%), #07070d; }
+#problem { --prev: #0c0c14 !important; } #why-now { --prev: #120f24 !important; } #how { --prev: #0a1622 !important; } #who { --prev: #081a14 !important; } #shape { --prev: #10170a !important; } #team { --prev: #120f24 !important; }
 
 /* Section colours, dark */
 #problem { --band: #120f24 !important; --tint: #251d4d !important; --acc: #a28fff !important; }
@@ -414,13 +477,17 @@ nav.links a[data-sec="why-now"] { --tint: #0e2a40 !important; --acc: #5cb6f2 !im
 nav.links a[data-sec="how"] { --tint: #0d3529 !important; --acc: #3fd1a2 !important; }
 nav.links a[data-sec="who"] { --tint: #22330f !important; --acc: #a3d45a !important; }
 nav.links a[data-sec="team"] { --tint: #0e2a40 !important; --acc: #5cb6f2 !important; }
-section.s.band { background: radial-gradient(70% 90% at 100% 10%, color-mix(in srgb, var(--acc) 14%, transparent) 0%, transparent 70%), var(--band); }
+:root { --aur-1: rgba(106,79,232,.34); --aur-2: rgba(7,132,201,.24); --aur-3: rgba(14,159,117,.20); --aur-4: rgba(92,157,19,.14); }
+section.s.band { background: linear-gradient(to bottom, var(--prev, var(--band)) 0, color-mix(in srgb, var(--prev, var(--band)) 0%, transparent) var(--fade)), radial-gradient(70% 90% at 100% 10%, color-mix(in srgb, var(--acc) 14%, transparent) 0%, transparent 70%), var(--band); }
 
 </style>
 <script>
 (function () {
-  var mode = 'dark';
-  try { mode = localStorage.getItem('diafane-mode') || 'dark'; } catch (e) {}
+  var mode = null;
+  try { mode = sessionStorage.getItem('diafane-mode'); } catch (e) {}
+  if (mode !== 'dark' && mode !== 'light') {
+    mode = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
   var css = document.getElementById('dark-css');
   if (css) css.disabled = mode === 'light';
   document.documentElement.classList.toggle('is-dark', mode !== 'light');
@@ -433,7 +500,7 @@ section.s.band { background: radial-gradient(70% 90% at 100% 10%, color-mix(in s
 <body>
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="#top" aria-label="DiafaneAI home"><img class="logo-img logo-mark on-light" src="assets/mark-light.png" alt="" width="38" height="36"><img class="logo-img logo-mark on-dark" src="assets/mark-dark.png" alt="" width="38" height="36"><img class="logo-img logo-text on-light" src="assets/text-light.png" alt="DiafaneAI" width="124" height="22"><img class="logo-img logo-text on-dark" src="assets/text-dark.png" alt="DiafaneAI" width="124" height="22"></a>
+    <a class="brand" href="#top" aria-label="DiafaneAI home"><img class="logo-img logo-full on-light" src="assets/logo-light.png" alt="DiafaneAI" width="193" height="34"><img class="logo-img logo-full on-dark" src="assets/logo-dark.png" alt="DiafaneAI" width="193" height="34"></a>
     <nav class="links" aria-label="Sections"><a href="#problem" data-sec="problem" style="--acc:#5a3fd6;--tint:#e8e3fc">Problem</a><a href="#why-now" data-sec="why-now" style="--acc:#066aa3;--tint:#d9ecf8">Why now</a><a href="#how" data-sec="how" style="--acc:#0a7a59;--tint:#d5efe5">How it works</a><a href="#who" data-sec="who" style="--acc:#44770e;--tint:#e3efd3">Who it's for</a><a href="#team" data-sec="team" style="--acc:#066aa3;--tint:#d9ecf8">Team</a><a class="pill dark" href="#contact" data-sec="contact">Talk to us</a></nav>
     <button type="button" class="mode-toggle" id="mode-toggle" aria-label="Switch to light mode"><svg class="sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg><svg class="moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
   </div>
@@ -444,14 +511,15 @@ section.s.band { background: radial-gradient(70% 90% at 100% 10%, color-mix(in s
   <section class="hero">
     <div class="wrap">
       <div class="copy">
-        <h1>An audit trail<br><span class="g">for AI in GMP documents</span></h1>
+        <div class="aurora" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <h1>An audit trail<br><span class="g">for AI in GMP&nbsp;documents</span></h1>
         <p class="lead">Quality teams are starting to use AI for SOPs, deviations and CAPAs. Regulators expect <b>qualified, accountable people</b>, not the AI, to approve the result. DiafaneAI is being built to show <b>where AI was used</b> and <b>who decided</b>.</p>
         <div class="ctas">
           <a class="pill dark" href="#contact">Share your QA experience <span class="dot" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5h6M5.5 2.5L8 5 5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
           <a class="pill light" href="#how">How it works</a>
         </div>
+        <div class="ticker" aria-hidden="true"><span class="live"></span><span class="tk-item"><span class="lbl human">Person</span><span class="tk-text">14:01 · Prompt sent · QA Specialist</span></span></div>
         <p class="stage">We are speaking with QA professionals to understand how AI is used in GMP documentation today. Your experience shapes what we build.</p>
-        <a class="scroll-cue" href="#example" aria-label="Scroll to the example"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 2v10M2.5 7.5L7 12l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
       </div>
 
       <div class="stage-panel" id="example">
@@ -538,11 +606,11 @@ section.s.band { background: radial-gradient(70% 90% at 100% 10%, color-mix(in s
         <table>
           <thead><tr><th>Requirement</th><th>What it means for AI use</th></tr></thead>
           <tbody>
-            <tr><td>ALCOA+, EU GMP Annex 11, 21 CFR Part 11<sup class="ref"><a href="#src-3" aria-label="Source 3">3</a></sup><sup class="ref"><a href="#src-4" aria-label="Source 4">4</a></sup><sup class="ref"><a href="#src-5" aria-label="Source 5">5</a></sup></td><td>Records must show who (a person or a system) created or changed what, and when. EU GMP also asks why GMP-relevant data was changed. Once AI is involved, these questions become harder to answer.</td></tr>
-            <tr><td>Quality unit responsibility</td><td>The quality unit approves or rejects procedures, specifications, materials and products, and GMP documents are approved by authorised people. AI can support this work, but the company stays accountable for the integrity of records produced with AI.<sup class="ref"><a href="#src-1" aria-label="Source 1">1</a></sup><sup class="ref"><a href="#src-2" aria-label="Source 2">2</a></sup><sup class="ref"><a href="#src-8" aria-label="Source 8">8</a></sup></td></tr>
-            <tr><td>EU GMP Annex 22 (draft)</td><td>The first EU GMP annex dedicated to AI, published as a draft in July 2025 and not yet final. The draft keeps generative AI out of critical GMP uses, but the EMA is now reconsidering this and has discussed allowing it under a documented, risk-based control strategy.<sup class="ref"><a href="#src-6" aria-label="Source 6">6</a></sup><sup class="ref"><a href="#src-9" aria-label="Source 9">9</a></sup></td></tr>
-            <tr><td>FDA enforcement</td><td>In April 2026 the FDA cited a drug manufacturer whose quality unit had not reviewed specifications, procedures and master production records created with AI. The FDA stated that AI output or recommendations must be reviewed and cleared by an authorised person in the quality unit.<sup class="ref"><a href="#src-1" aria-label="Source 1">1</a></sup></td></tr>
-            <tr><td>Inspections</td><td>An HPRA GMP inspector said at the 2026 QP Forum in Dublin that inspectors may ask at the opening meeting whether AI is used in any GMP system or process.<sup class="ref"><a href="#src-7" aria-label="Source 7">7</a></sup></td></tr>
+            <tr><td>ALCOA+, EU GMP Annex 11, 21 CFR Part <span class="nw">11<sup class="ref"><a href="#src-1" aria-label="Source 1">1</a></sup><sup class="ref"><a href="#src-2" aria-label="Source 2">2</a></sup><sup class="ref"><a href="#src-3" aria-label="Source 3">3</a></sup></span></td><td>Records must show who (a person or a system) created or changed what, and when. EU GMP also asks why GMP-relevant data was changed. Once AI is involved, these questions become harder to answer.</td></tr>
+            <tr><td>Quality unit responsibility</td><td>The quality unit approves or rejects procedures, specifications, materials and products, and GMP documents are approved by authorised people. AI can support this work, but the company stays accountable for the integrity of records produced with <span class="nw">AI.<sup class="ref"><a href="#src-4" aria-label="Source 4">4</a></sup><sup class="ref"><a href="#src-5" aria-label="Source 5">5</a></sup><sup class="ref"><a href="#src-6" aria-label="Source 6">6</a></sup></span></td></tr>
+            <tr><td>EU GMP Annex 22 (draft)</td><td>The first EU GMP annex dedicated to AI, published as a draft in July 2025 and not yet final. The draft keeps generative AI out of critical GMP uses, but the EMA is now reconsidering this and has discussed allowing it under a documented, risk-based control <span class="nw">strategy.<sup class="ref"><a href="#src-7" aria-label="Source 7">7</a></sup><sup class="ref"><a href="#src-8" aria-label="Source 8">8</a></sup></span></td></tr>
+            <tr><td>FDA enforcement</td><td>In April 2026 the FDA cited a drug manufacturer whose quality unit had not reviewed specifications, procedures and master production records created with AI. The FDA stated that AI output or recommendations must be reviewed and cleared by an authorised person in the quality <span class="nw">unit.<sup class="ref"><a href="#src-4" aria-label="Source 4">4</a></sup></span></td></tr>
+            <tr><td>Inspections</td><td>An HPRA GMP inspector said at the 2026 QP Forum in Dublin that inspectors may ask at the opening meeting whether AI is used in any GMP system or <span class="nw">process.<sup class="ref"><a href="#src-9" aria-label="Source 9">9</a></sup></span></td></tr>
           </tbody>
         </table>
       </div>
@@ -622,7 +690,7 @@ section.s.band { background: radial-gradient(70% 90% at 100% 10%, color-mix(in s
     <div class="wrap">
       <div class="s-head">
         <span class="sec-label">Who it's for</span>
-        <h2>Built for pharma companies<br><span class="g">that want AI and inspection-readiness</span></h2>
+        <h2>Built for pharma companies<br><span class="g">that want AI and&nbsp;inspection-readiness</span></h2>
         <p class="lead">We are starting in Switzerland.</p>
       </div>
       <div class="aud">
@@ -693,8 +761,9 @@ section.s.band { background: radial-gradient(70% 90% at 100% 10%, color-mix(in s
           <div class="photo has-img"><img src="assets/team-1.jpg" alt="Portrait of Sinia Gloor" width="600" height="600" loading="lazy"></div>
           <div>
             <h3>Sinia</h3>
-            <span class="role">Co-founder · Environmental engineer</span>
+            <span class="role">Co-founder · Environmental Engineer</span>
             <p>I’m an environmental engineer with experience in industry projects and international applied research. As an engineer, I’m driven by solving real-world problems. I’ve learned to connect disciplines and design solutions that work outside the lab.</p>
+            <div class="t-links"><a href="mailto:sinia@diafaneai.com" aria-label="Email Sinia"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5l8.5 6 8.5-6"/></svg><span>sinia@diafaneai.com</span></a><a href="https://www.linkedin.com/in/sinia-gloor/" target="_blank" rel="noopener" class="li" aria-label="Sinia on LinkedIn"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg><span>LinkedIn</span></a></div>
           </div>
         </div>
         <div class="panel">
@@ -703,6 +772,7 @@ section.s.band { background: radial-gradient(70% 90% at 100% 10%, color-mix(in s
             <h3>Manuel</h3>
             <span class="role">Co-founder · Chemical and Bioengineer</span>
             <p>I’m a Chemical and Bioengineer from ETH Zurich and wrote my master’s thesis at MIT. I enjoy working where science, industry and people meet. I want to build tools that make complex processes clear and trustworthy.</p>
+            <div class="t-links"><a href="mailto:manuel@diafaneai.com" aria-label="Email Manuel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5l8.5 6 8.5-6"/></svg><span>manuel@diafaneai.com</span></a><a href="https://www.linkedin.com/in/manuel-meinhardt/" target="_blank" rel="noopener" class="li" aria-label="Manuel on LinkedIn"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg><span>LinkedIn</span></a></div>
           </div>
         </div>
       </div>
@@ -713,36 +783,33 @@ section.s.band { background: radial-gradient(70% 90% at 100% 10%, color-mix(in s
     <div class="wrap">
       <div class="copy">
         <h2>We would like to learn from you.<br><span class="g">Help shape DiafaneAI.</span></h2>
-        <p class="lead">If you write, review or approve GMP documents, your view helps us build something that works in real QA work. A conversation takes about 15 minutes. It is about your experience, not about our product.</p>
-        <div class="confid">
-          <span>We are interested in your personal view of how things work in practice, not in your company's internal details. Please only share what you are free to share.</span>
-        </div>
+        <p class="lead">If you write, review or approve GMP documents, we are interested in your experience and your personal view of how things work in practice and where the industry is going. Your view helps us build something that works in real QA work. A conversation takes about 15 minutes. It is about your experience, not about our product.</p>
         <a class="pill dark" href="#contact" data-open-contact>Talk to us <span class="dot" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5h6M5.5 2.5L8 5 5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
-        <p class="mail-line">Or write to <span class="sel">contact@diafaneai.com</span></p>
+        <p class="mail-line">Or write to <span class="sel">contact@diafaneai.com</span> · Follow us on <a class="mail-li" href="https://www.linkedin.com/company/diafaneai/" target="_blank" rel="noopener">LinkedIn</a></p>
       </div>
     </div>
   </section>
   <section class="sources" id="sources">
     <div class="wrap">
       <h2>Sources</h2>
-      <p class="muted-note">Numbers in the Why now section refer to the sources below. All links checked in October 2026.</p>
-      <ol class="src-list"><li id="src-1"><span class="n">1</span><div><b>U.S. FDA</b>, Warning Letter to Purolea Cosmetics Lab (MARCS-CMS 722591). <span class="d">2 April 2026.</span><br><a href="https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/purolea-cosmetics-lab-722591-04022026" target="_blank" rel="noopener">www.fda.gov</a></div></li><li id="src-2"><span class="n">2</span><div><b>U.S. Code of Federal Regulations</b>, 21 CFR 211.22: Responsibilities of quality control unit. <span class="d">current version.</span><br><a href="https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-211/subpart-B/section-211.22" target="_blank" rel="noopener">www.ecfr.gov</a></div></li><li id="src-3"><span class="n">3</span><div><b>PIC/S</b>, PI 041-1: Good Practices for Data Management and Integrity in Regulated GMP/GDP Environments (ALCOA+). <span class="d">2021.</span><br><a href="https://picscheme.org/docview/4234" target="_blank" rel="noopener">picscheme.org</a></div></li><li id="src-4"><span class="n">4</span><div><b>European Commission</b>, EudraLex Volume 4, Annex 11: Computerised Systems. <span class="d">2011.</span><br><a href="https://health.ec.europa.eu/system/files/2016-11/annex11_01-2011_en_0.pdf" target="_blank" rel="noopener">health.ec.europa.eu</a></div></li><li id="src-5"><span class="n">5</span><div><b>U.S. Code of Federal Regulations</b>, 21 CFR Part 11: Electronic Records; Electronic Signatures. <span class="d">current version.</span><br><a href="https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11" target="_blank" rel="noopener">www.ecfr.gov</a></div></li><li id="src-6"><span class="n">6</span><div><b>European Commission</b>, Draft EudraLex Volume 4, Annex 22: Artificial Intelligence (stakeholder consultation, not final). <span class="d">July 2025.</span><br><a href="https://health.ec.europa.eu/consultations/stakeholders-consultation-eudralex-volume-4-good-manufacturing-practice-guidelines-chapter-4-annex_en" target="_blank" rel="noopener">health.ec.europa.eu</a></div></li><li id="src-7"><span class="n">7</span><div><b>HPRA (Ireland)</b>, Q&amp;A presentation by an HPRA GMP inspector at the QP Forum 2026, Trinity College Dublin. <span class="d">May 2026.</span><br><a href="https://www.tcd.ie/media/tcd/pharmacy/images/qp-forums/qp-forum-2026/presentations/9.3-HPRA-QA.pdf" target="_blank" rel="noopener">www.tcd.ie</a></div></li><li id="src-8"><span class="n">8</span><div><b>European Commission</b>, Draft EudraLex Volume 4, Chapter 4: Documentation, section 4.24 on AI-generated records (stakeholder consultation, not final). <span class="d">July 2025.</span><br><a href="https://health.ec.europa.eu/document/download/fa336a6e-753b-46fc-b53b-9178bacd8878_en?filename=mp_vol4_chap4_consultation_guideline_en.pdf" target="_blank" rel="noopener">health.ec.europa.eu</a></div></li><li id="src-9"><span class="n">9</span><div><b>European Medicines Agency (EMA)</b>, Report: Multistakeholder workshop on expert contributions to artificial intelligence guidance development (Annex 22), EMA/156789/2026. <span class="d">Workshop held 30 June 2026.</span><br><a href="https://www.ema.europa.eu/en/documents/report/report-multistakeholder-workshop-expert-contributions-artificial-intelligence-guidance-development-annex-22_en.pdf" target="_blank" rel="noopener">www.ema.europa.eu</a></div></li></ol>
+      <p class="muted-note">Numbers in the Why now section refer to the sources below. <a class="src-all" href="sources.html">Full references with links →</a></p>
+      <ol class="src-list"><li id="src-1"><span class="n">1</span><a href="sources.html#src-1"><b>PIC/S PI 041-1</b> · Data integrity guidance <span class="d">(2021)</span></a></li><li id="src-2"><span class="n">2</span><a href="sources.html#src-2"><b>EU GMP Annex 11</b> · Computerised systems <span class="d">(2011)</span></a></li><li id="src-3"><span class="n">3</span><a href="sources.html#src-3"><b>21 CFR Part 11</b> · Electronic records and signatures <span class="d">(current)</span></a></li><li id="src-4"><span class="n">4</span><a href="sources.html#src-4"><b>FDA Warning Letter 722591</b> · AI-created GMP records <span class="d">(April 2026)</span></a></li><li id="src-5"><span class="n">5</span><a href="sources.html#src-5"><b>21 CFR 211.22</b> · Quality control unit <span class="d">(current)</span></a></li><li id="src-6"><span class="n">6</span><a href="sources.html#src-6"><b>EU GMP Chapter 4, draft</b> · Documentation, section 4.24 <span class="d">(July 2025)</span></a></li><li id="src-7"><span class="n">7</span><a href="sources.html#src-7"><b>EU GMP Annex 22, draft</b> · Artificial intelligence <span class="d">(July 2025)</span></a></li><li id="src-8"><span class="n">8</span><a href="sources.html#src-8"><b>EMA workshop report</b> · Annex 22 <span class="d">(2026)</span></a></li><li id="src-9"><span class="n">9</span><a href="sources.html#src-9"><b>HPRA, QP Forum 2026</b> · Inspector Q&amp;A <span class="d">(May 2026)</span></a></li></ol>
     </div>
   </section>
 </main>
 
 <footer>
   <div class="wrap">
-    <span class="foot-brand"><img class="logo-img logo-mark on-light" src="assets/mark-light.png" alt="" width="26" height="25"><img class="logo-img logo-mark on-dark" src="assets/mark-dark.png" alt="" width="26" height="25"><img class="logo-img logo-text on-light" src="assets/text-light.png" alt="DiafaneAI" width="90" height="16"><img class="logo-img logo-text on-dark" src="assets/text-dark.png" alt="DiafaneAI" width="90" height="16"></span>
+    <span class="foot-brand"><img class="logo-img logo-full on-light" src="assets/logo-light.png" alt="DiafaneAI" width="136" height="24"><img class="logo-img logo-full on-dark" src="assets/logo-dark.png" alt="DiafaneAI" width="136" height="24"></span>
     <span>© 2026 DiafaneAI · Switzerland</span>
-    <nav aria-label="Legal"><a href="#sources">Sources</a><a href="imprint.html">Imprint</a><a href="privacy.html">Privacy</a></nav>
+    <nav aria-label="Legal"><a href="https://www.linkedin.com/company/diafaneai/" target="_blank" rel="noopener">LinkedIn</a><a href="sources.html">Sources</a><a href="imprint.html">Imprint</a><a href="privacy.html">Privacy</a></nav>
   </div>
   <div class="wrap tm-note">DiafaneAI is a project by private individuals and not a registered company. Information on regulations on this website is for general information only and is not legal or regulatory advice. DiafaneAI is not affiliated with, endorsed by, sponsored by or otherwise connected to any company, organisation, regulatory authority or government named on this website. Microsoft Word, Copilot, ChatGPT, Veeva, MasterControl and TrackWise are trademarks of their respective owners. References to regulators and their publications are for information only.</div>
 </footer>
 
 <script>
 (function () {
-  var ids = ['problem', 'why-now', 'how', 'who', 'contact'];
+  var ids = ['problem', 'why-now', 'how', 'who', 'team', 'contact']; // 'For companies' (#shape) belongs to 'Who it's for'
   var secs = ids.map(function (id) { return document.getElementById(id); });
   var links = {};
   document.querySelectorAll('nav.links a[data-sec]').forEach(function (a) { links[a.getAttribute('data-sec')] = a; });
@@ -752,7 +819,7 @@ section.s.band { background: radial-gradient(70% 90% at 100% 10%, color-mix(in s
   var current = null, ticking = false;
   function update() {
     ticking = false;
-    var offset = (header ? header.offsetHeight : 70) + 40;
+    var offset = (header ? header.offsetHeight : 70) + 140;
     var active = null;
     secs.forEach(function (sec, i) { if (sec && sec.getBoundingClientRect().top <= offset) active = ids[i]; });
     var doc = document.documentElement;
@@ -768,7 +835,7 @@ section.s.band { background: radial-gradient(70% 90% at 100% 10%, color-mix(in s
     });
     if (active && nav && nav.scrollWidth > nav.clientWidth) {
       var a = links[active];
-      nav.scrollTo({ left: a.offsetLeft - nav.clientWidth / 2 + a.offsetWidth / 2, behavior: 'smooth' });
+      if (a) nav.scrollTo({ left: a.offsetLeft - nav.clientWidth / 2 + a.offsetWidth / 2, behavior: 'smooth' });
     }
   }
   window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
@@ -781,8 +848,7 @@ section.s.band { background: radial-gradient(70% 90% at 100% 10%, color-mix(in s
   <div class="cx-box">
     <button type="button" class="cx-close" data-cx-close aria-label="Close"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
     <h2 id="cx-title">Talk to us<br><span class="g">15 minutes to hear your view.</span></h2>
-    <p>We are talking to QA professionals to understand how AI is used in GMP documentation. Tell us what challenges you see in the industry and how a product could help.</p>
-    <p class="cx-conf">We are interested in your personal view of how things work in practice, not in your company's internal details. Please only share what you are free to share.</p>
+    <p>We are talking to QA professionals to understand how AI is used in GMP documentation. We are interested in your experience and your personal view of how things work in practice and where the industry is going. Tell us what challenges you see in the industry and how a product could help.</p>
     <p class="cx-conf">How we handle your data is explained in our <a href="privacy.html">privacy statement</a>.</p>
     <div class="cx-mail"><span id="cx-addr">contact@diafaneai.com</span><button type="button" id="cx-copy">Copy</button></div>
     <div class="cx-actions"><a class="pill dark" href="mailto:contact@diafaneai.com">Write an email</a></div>
@@ -831,8 +897,18 @@ section.s.band { background: radial-gradient(70% 90% at 100% 10%, color-mix(in s
   btn.addEventListener('click', function () {
     var next = css.disabled ? 'dark' : 'light';
     apply(next);
-    try { localStorage.setItem('diafane-mode', next); } catch (e) {}
+    try { sessionStorage.setItem('diafane-mode', next); } catch (e) {}
   });
+  // Follow the computer's light/dark setting live, unless the visitor picked a mode in this session
+  var mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  if (mq) {
+    var onChange = function (e) {
+      var saved = null;
+      try { saved = sessionStorage.getItem('diafane-mode'); } catch (err) {}
+      if (!saved) apply(e.matches ? 'dark' : 'light');
+    };
+    if (mq.addEventListener) mq.addEventListener('change', onChange); else if (mq.addListener) mq.addListener(onChange);
+  }
 })();
 </script>
 
@@ -860,6 +936,33 @@ section.s.band { background: radial-gradient(70% 90% at 100% 10%, color-mix(in s
     window.location.href = href;
     done.hidden = false; note.hidden = true;
   });
+})();
+</script>
+
+<script>
+/* D: audit-trail ticker in the hero */
+(function () {
+  var box = document.querySelector('.ticker');
+  if (!box) return;
+  var items = [
+    ['human', 'Person', '14:01 · Prompt sent · QA Specialist'],
+    ['ai', 'AI', '14:02 · 3 root causes suggested'],
+    ['human', 'Person', '14:09 · Option B chosen · QA Specialist'],
+    ['joint', 'Person + AI', '14:12 · §2 revised together, 38 % changed'],
+    ['human', 'Person', '14:32 · Signed "Approved" · QA Manager']
+  ];
+  var i = 0;
+  setInterval(function () {
+    if (!document.documentElement.classList.contains('anim-d') || document.hidden) return;
+    i = (i + 1) % items.length;
+    var it = items[i];
+    var old = box.querySelector('.tk-item');
+    var el = document.createElement('span');
+    el.className = 'tk-item';
+    el.innerHTML = '<span class="lbl ' + it[0] + '">' + it[1] + '</span><span class="tk-text"></span>';
+    el.querySelector('.tk-text').textContent = it[2];
+    if (old) old.replaceWith(el); else box.appendChild(el);
+  }, 9000);
 })();
 </script>
 
